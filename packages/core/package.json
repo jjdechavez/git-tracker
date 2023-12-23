@@ -4,14 +4,22 @@
   "type": "module",
   "scripts": {
     "test": "sst bind vitest",
-    "typecheck": "tsc -noEmit"
+    "typecheck": "tsc -noEmit",
+    "migration:run": "tsx ./src/kysely/migrator.ts latest",
+    "migration:rollback": "tsx ./src/kysely/migrator.ts rollback",
+    "make:migration": "tsx ./src/kysely/createMigrationFile.cjs"
   },
   "devDependencies": {
-    "vitest": "^1.1.0",
+    "@types/better-sqlite3": "^7.6.8",
     "@types/node": "^20.10.5",
-    "sst": "^2.38.7"
+    "sst": "^2.38.7",
+    "tsx": "^4.7.0",
+    "vitest": "^1.1.0"
   },
   "dependencies": {
+    "@libsql/kysely-libsql": "^0.3.0",
+    "better-sqlite3": "^9.2.2",
+    "kysely": "^0.26.3",
     "zod": "^3.22.4"
   }
 }
