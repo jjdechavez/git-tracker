@@ -1,14 +1,14 @@
 import { SSTConfig } from "sst";
-import { API } from "./stacks/MyStack";
+import { ApiStack } from "./stacks/ApiStack";
 
 export default {
   config(_input) {
     return {
       name: "git-tracker",
-      region: "us-east-1",
+      region: "ap-southeast-1",
     };
   },
   stacks(app) {
-    app.stack(API);
-  }
+    app.stack(ApiStack);
+  },
 } satisfies SSTConfig;
