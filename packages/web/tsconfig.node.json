@@ -1,10 +1,22 @@
 {
   "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["vite.config.ts"]
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client"],
+    "noEmit": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@console/functions/*": ["../../functions/src/*"],
+      "@console/core/*": ["../../core/src/*"],
+      "$/*": ["./src/*"]
+    }
+  }
 }
