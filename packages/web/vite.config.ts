@@ -1,18 +1,9 @@
 import { defineConfig } from "vite";
-import { macaronVitePlugin } from "@macaron-css/vite";
 import solid from "vite-plugin-solid";
 import path from "path";
 
 export default defineConfig({
-  plugins: [solid(), macaronVitePlugin()],
-  optimizeDeps: {
-    esbuildOptions: {
-      target: "es2020",
-    },
-  },
-  build: {
-    target: "esnext",
-  },
+  plugins: [solid()],
   resolve: {
     alias: {
       "@console/functions": path.resolve(__dirname, "../../functions/src"),
