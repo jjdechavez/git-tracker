@@ -5,17 +5,24 @@ const fs = require("fs");
  * @param {string} name migration filename
  */
 function createMigrationFile(name) {
-  console.log(__dirname)
   const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
-  const fileName = `${timestamp}_${name}.ts`;
+  const fileName = `${timestamp}_${name}.mjs`;
   const filePath = path.join(__dirname, '/migrations/', fileName);
 
   const fileContent = `import { Kysely } from 'kysely'
 
+/**
+ * @param {Kysely<any>} db
+ * @returns {Promise<void>}
+ */
 export async function up(db: Kysely<any>): Promise<void> {
   // Migration code
 }
 
+/**
+ * @param {Kysely<any>} db
+ * @returns {Promise<void>}
+ */
 export async function down(db: Kysely<any>): Promise<void> {
   // Migration code
 }`;

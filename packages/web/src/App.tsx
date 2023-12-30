@@ -1,18 +1,13 @@
-// import { createSignal } from "solid-js";
-// import './App.css'
+import { Router, Route } from "@solidjs/router";
+import SigninRoute from "./routes/signin";
 
 function App() {
-  // const [theme, setTheme] = createSignal<string>(
-  //   window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-  // );
-
   return (
-    <div>
-      <h1>Vite + Solid</h1>
-      <p class="read-the-docs">
-        Click on the Vite and Solid logos to learn more
-      </p>
-    </div>
+    <Router>
+      <Route path="/" component={() => <div>Home Page</div>} />
+      <Route path="/about" component={() => <div>About Page</div>} />
+      <Route path="/signin" component={SigninRoute} />
+    </Router>
   );
 }
 

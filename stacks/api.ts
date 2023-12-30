@@ -13,10 +13,21 @@ export function ApiStack({ stack }: StackContext) {
     defaults: {
       function: {
         bind: [secrets.GITHUB_CLIENT_ID, secrets.GITHUB_CLIENT_SECRET],
+        nodejs: {
+          esbuild: {
+            external: ["better-sqlite3"]
+          }
+        }
       },
     },
     routes: {
       "GET /": "packages/functions/src/lambda.handler",
+      "GET /migration/latest": {
+        function: {
+          handler: "packages/functions/src/migrator.latest",
+          description: "Migrate to latest on db",
+        },
+      },
     },
   });
 
