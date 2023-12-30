@@ -11,3 +11,7 @@ export function zod<
   result.schema = schema;
   return result;
 }
+
+export const idSchema = z
+  .union([z.string(), z.number()])
+  .pipe(z.coerce.number());

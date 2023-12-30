@@ -1,7 +1,8 @@
-import { AuthHandler, GithubAdapter, Session } from "sst/node/auth";
+import { AuthHandler, GithubAdapter, Session, useSession } from "sst/node/auth";
 // import { StaticSite } from "sst/node/site";
 import { Config } from "sst/node/config";
 import { User } from "@git-tracker/core/user";
+import { ApiHandler, Response } from "sst/node/api";
 
 declare module "sst/node/auth" {
   export interface SessionTypes {
@@ -66,4 +67,22 @@ export const handler = AuthHandler({
       },
     }),
   },
+});
+
+export const session = ApiHandler(async () => {
+  const session = useSession();
+
+  if (session.type !== "user") {
+    throw new Response({
+      statusCode: 401,
+      body: "Unauthorized",
+    });
+  }
+
+  const user = User.findById(session.properties.userID);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(user),
+  };
 });
