@@ -5,8 +5,8 @@
   "scripts": {
     "test": "sst bind vitest",
     "typecheck": "tsc -noEmit",
-    "migration:run": "tsx ./src/kysely/migrator.ts latest",
-    "migration:rollback": "tsx ./src/kysely/migrator.ts rollback",
+    "migration:run": "tsx ./src/kysely/migrator.cmd.ts latest",
+    "migration:rollback": "tsx ./src/kysely/migrator.cmd.ts rollback",
     "make:migration": "tsx ./src/kysely/createMigrationFile.cjs"
   },
   "devDependencies": {
