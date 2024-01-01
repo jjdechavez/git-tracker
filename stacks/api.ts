@@ -15,9 +15,9 @@ export function ApiStack({ stack }: StackContext) {
         bind: [secrets.GITHUB_CLIENT_ID, secrets.GITHUB_CLIENT_SECRET],
         nodejs: {
           esbuild: {
-            external: ["better-sqlite3"]
-          }
-        }
+            external: ["better-sqlite3"],
+          },
+        },
       },
     },
     routes: {
@@ -32,6 +32,12 @@ export function ApiStack({ stack }: StackContext) {
         function: {
           handler: "packages/functions/src/auth.session",
           description: "Get user by token",
+        },
+      },
+      "POST /projects": {
+        function: {
+          handler: "packages/functions/src/project.create",
+          description: "Create project",
         },
       },
     },
