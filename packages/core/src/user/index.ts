@@ -29,12 +29,13 @@ export const findByEmail = z
 export const findById = z
   .function()
   .args(idSchema)
-  .implement(async (userID) => {
-    db.selectFrom("user")
+  .implement(async (userID) =>
+    db
+      .selectFrom("user")
       .where("id", "=", userID)
       .select(["user.id", "user.name", "user.email", "user.avatar_url"])
-      .executeTakeFirst();
-  });
+      .executeTakeFirst()
+  );
 
 export const create = z
   .function()

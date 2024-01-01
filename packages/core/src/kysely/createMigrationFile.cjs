@@ -15,7 +15,7 @@ function createMigrationFile(name) {
  * @param {Kysely<any>} db
  * @returns {Promise<void>}
  */
-export async function up(db: Kysely<any>): Promise<void> {
+export async function up(db) {
   // Migration code
 }
 
@@ -23,7 +23,7 @@ export async function up(db: Kysely<any>): Promise<void> {
  * @param {Kysely<any>} db
  * @returns {Promise<void>}
  */
-export async function down(db: Kysely<any>): Promise<void> {
+export async function down(db) {
   // Migration code
 }`;
 
