@@ -3,7 +3,7 @@ import { render } from "solid-js/web";
 
 import "./index.css";
 import App from "./App";
-import { StorageProvider } from "./providers/account";
+import { StorageProvider } from "./providers/storage";
 
 const root = document.getElementById("root");
 

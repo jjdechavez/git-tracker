@@ -28,6 +28,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Migrate to latest on db",
         },
       },
+      "GET /session": {
+        function: {
+          handler: "packages/functions/src/auth.session",
+          description: "Get user by token",
+        },
+      },
     },
   });
 
