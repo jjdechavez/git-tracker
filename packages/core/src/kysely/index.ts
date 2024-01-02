@@ -1,11 +1,14 @@
 import { Kysely, SqliteDialect } from "kysely";
 import SQLite from "better-sqlite3";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
-import { UserTable } from "../user/user.sql";
 import { server } from "../util/server.env";
+
+import { UserTable } from "../user/user.sql";
+import { ProjectTable } from "../project/project.sql";
 
 interface Database {
   user: UserTable;
+  project: ProjectTable;
 }
 
 const dialect = server.devMode
