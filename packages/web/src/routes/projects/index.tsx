@@ -1,6 +1,8 @@
 import { Match, Switch } from "solid-js";
 import { Navigate, Route, Router } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
+import { EmptyState } from "~/components/empty";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -34,38 +36,50 @@ function Overview() {
             Overview
           </h1>
           <p class="text-base leading-relaxed">
-            Blue bottle crucifix vinyl post-ironic four dollar toast vegan
+            View and manage your platforms
           </p>
         </div>
 
         {/* display list inspired from preline https://www.preline.co/examples/application-invoice.html */}
-
-        <div class="flex items-center border-b pb-10 mb-10 border-gray-800 sm:flex-row flex-col">
-          <div class="flex-grow sm:text-left text-center mt-6 sm:mt-0">
-            <h2 class="text-white text-lg title-font font-medium mb-2">
-              Shooting Stars
-            </h2>
-            <p class="leading-relaxed text-base">
-              Blue bottle crucifix vinyl post-ironic four dollar toast vegan
-              taxidermy. Gastropub indxgo juice poutine.
-            </p>
-            <a class="mt-3 text-indigo-400 inline-flex items-center">
-              Learn More
-              <svg
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                class="w-4 h-4 ml-2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7"></path>
-              </svg>
-            </a>
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Platforms</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EmptyState message="No platforms to show" />
+          </CardContent>
+        </Card>
       </div>
     </section>
+  );
+}
+
+function DataList() {
+  return (
+    <div class="flex items-center border-b pb-10 mb-10 border-gray-800 sm:flex-row flex-col">
+      <div class="flex-grow sm:text-left text-center mt-6 sm:mt-0">
+        <h2 class="text-white text-lg title-font font-medium mb-2">
+          Shooting Stars
+        </h2>
+        <p class="leading-relaxed text-base">
+          Blue bottle crucifix vinyl post-ironic four dollar toast vegan
+          taxidermy. Gastropub indxgo juice poutine.
+        </p>
+        <a class="mt-3 text-indigo-400 inline-flex items-center">
+          Learn More
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            class="w-4 h-4 ml-2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
   );
 }
