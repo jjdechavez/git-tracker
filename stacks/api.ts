@@ -40,6 +40,18 @@ export function ApiStack({ stack }: StackContext) {
           description: "Create project",
         },
       },
+      "GET /projects": {
+        function: {
+          handler: "packages/functions/src/project.list",
+          description: "List of projects",
+        },
+      },
+      "GET /projects/{slug}": {
+        function: {
+          handler: "packages/functions/src/project.slug",
+          description: "Get project by slug",
+        },
+      },
     },
   });
 
