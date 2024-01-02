@@ -7,7 +7,7 @@ export const getSessionByToken = async (token: string) => {
     email: z.string(),
   });
 
-  const session = await externalApi
+  const session = await externalApi()
     .url("/session")
     .auth(`Bearer ${token}`)
     .get()
