@@ -14,6 +14,8 @@ import { ProjectsRoute } from "./routes/projects";
 import { CreateProjectRoute } from "./routes/projects/create";
 import { AvatarInitialsIcon } from "./components/avatar";
 import { findProjectBySlug, listProjects } from "./data/project";
+import { twMerge } from "tailwind-merge";
+import { buttonSizes, buttonVariants } from "./components/button";
 
 function App() {
   return (
@@ -152,7 +154,7 @@ function Layout(props: ParentProps) {
 
           <a
             href="/logout"
-            class="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0"
+            class={twMerge(buttonVariants.secondary, buttonSizes.sm, "inline-flex items-center mt-4 md:mt-0")}
           >
             Logout
           </a>

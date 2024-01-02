@@ -20,12 +20,12 @@ export function ProjectsRoute() {
 function Content() {
   return (
     <Router>
-      <Route path="*" component={Project} />
+      <Route path="*" component={Overview} />
     </Router>
   );
 }
 
-function Project() {
+function Overview() {
   return (
     <section>
       <div class="container p-5">
@@ -37,6 +37,8 @@ function Project() {
             Blue bottle crucifix vinyl post-ironic four dollar toast vegan
           </p>
         </div>
+
+        {/* display list inspired from preline https://www.preline.co/examples/application-invoice.html */}
 
         <div class="flex items-center border-b pb-10 mb-10 border-gray-800 sm:flex-row flex-col">
           <div class="flex-grow sm:text-left text-center mt-6 sm:mt-0">

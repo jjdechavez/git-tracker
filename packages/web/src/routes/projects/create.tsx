@@ -1,8 +1,9 @@
 import { action, redirect } from "@solidjs/router";
-import { Info } from "../../components/form/info";
-import { Input } from "../../components/form/input";
-import { Label } from "../../components/form/label";
-import { createProject } from "../../data/project";
+import { Info } from "~/components/form/info";
+import { Input } from "~/components/form/input";
+import { Label } from "~/components/form/label";
+import { Button } from "~/components/button";
+import { createProject } from "~/data/project";
 
 const createProjectAction = action(async (data: FormData) => {
   const name = data.get("name")?.toString();
@@ -41,9 +42,9 @@ export function CreateProjectRoute() {
               </Info>
             </div>
             <div class="p-2 w-full">
-              <button class="mx-auto w-full text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg disabled:cursor-not-allowed disabled:border-indigo-500 disabled:bg-indigo-600">
+              <Button variants="default" size="default" class="w-full">
                 Create Project
-              </button>
+              </Button>
             </div>
           </form>
         </div>
