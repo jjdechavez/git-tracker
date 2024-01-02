@@ -15,7 +15,7 @@ const createProjectAction = action(async (data: FormData) => {
     throw redirect("/projects", { revalidate: "" });
   }
 
-  return redirect(`/${project.data.slug}`);
+  return redirect(`/projects/${project.data.slug}`);
 });
 
 export function CreateProjectRoute() {
@@ -41,7 +41,7 @@ export function CreateProjectRoute() {
               </Info>
             </div>
             <div class="p-2 w-full">
-              <button class="mx-auto w-full text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+              <button class="mx-auto w-full text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg disabled:cursor-not-allowed disabled:border-indigo-500 disabled:bg-indigo-600">
                 Create Project
               </button>
             </div>
