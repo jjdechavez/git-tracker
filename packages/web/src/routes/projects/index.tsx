@@ -56,25 +56,50 @@ function Overview() {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Platforms</CardTitle>
-          </CardHeader>
-          <CardContent class="md:p-0">
-            <Show
-              when={platforms().length > 0}
-              fallback={
-                <EmptyState message="No platforms to show" class="md:p-7" />
-              }
-            >
-              <ListGroup>
-                <For each={platforms()}>
-                  {(_) => <ListGroupItem>SFM</ListGroupItem>}
-                </For>
-              </ListGroup>
-            </Show>
-          </CardContent>
-        </Card>
+        <div class="flex flex-col items-center gap-4 md:flex-row">
+          <Card class="flex-1 w-full">
+            <CardHeader>
+              <CardTitle>Platforms</CardTitle>
+            </CardHeader>
+            <CardContent class="md:p-0">
+              <Show
+                when={platforms().length > 0}
+                fallback={
+                  <EmptyState message="No platforms to show" class="md:p-7" />
+                }
+              >
+                <ListGroup>
+                  <For each={platforms()}>
+                    {(_) => <ListGroupItem>SFM</ListGroupItem>}
+                  </For>
+                </ListGroup>
+              </Show>
+            </CardContent>
+          </Card>
+
+          <Card class="flex-1 w-full">
+            <CardHeader>
+              <CardTitle>Production Pull Request</CardTitle>
+            </CardHeader>
+            <CardContent class="md:p-0">
+              <Show
+                when={platforms().length > 0}
+                fallback={
+                  <EmptyState
+                    message="No production pull request to show"
+                    class="md:p-7"
+                  />
+                }
+              >
+                <ListGroup>
+                  <For each={platforms()}>
+                    {(_) => <ListGroupItem>SFM</ListGroupItem>}
+                  </For>
+                </ListGroup>
+              </Show>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   );
