@@ -3,6 +3,7 @@ import { Navigate, Route, Router } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
 import { EmptyState } from "~/components/empty";
+import { ListGroup, ListGroupItem } from "~/components/list-group";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -45,8 +46,12 @@ function Overview() {
           <CardHeader>
             <CardTitle>Platforms</CardTitle>
           </CardHeader>
-          <CardContent>
-            <EmptyState message="No platforms to show" />
+          <CardContent class="md:p-0">
+            <ListGroup>
+              <ListGroupItem>SFM</ListGroupItem>
+              <ListGroupItem>Freshy</ListGroupItem>
+              <ListGroupItem>ST</ListGroupItem>
+            </ListGroup>
           </CardContent>
         </Card>
       </div>

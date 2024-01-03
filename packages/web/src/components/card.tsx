@@ -36,7 +36,7 @@ export const CardTitle = (props: JSX.HTMLAttributes<HTMLHeadingElement>) => {
   const [mainProps, otherProps] = splitProps(props, ["class", "children"]);
   return (
     <h2
-      class={twMerge("mt-1 text-sm text-gray-500", mainProps.class)}
+      class={twMerge("text-sm", mainProps.class)}
       {...otherProps}
     >
       {mainProps.children}
