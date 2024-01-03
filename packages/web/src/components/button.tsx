@@ -2,14 +2,15 @@ import { JSX, mergeProps, splitProps } from "solid-js";
 import { twJoin } from "tailwind-merge";
 
 interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
-  variants: "default" | "secondary" | "link";
-  size: "default" | "sm" | "lg" | "icon";
+  variants?: "default" | "secondary" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
 }
 
 export const buttonVariants = {
   default:
     "text-white border-0 bg-indigo-600 hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-  secondary: "text-base bg-gray-800 border-0 focus:outline-none hover:bg-gray-700",
+  secondary:
+    "text-base bg-gray-800 border-0 focus:outline-none hover:bg-gray-700",
   link: "",
 } as const;
 
@@ -27,12 +28,15 @@ export function Button(props: ButtonProps) {
     "variants",
     "size",
   ]);
-  const merged = mergeProps({ variants: "default", size: "default" }, props);
+  const merged = mergeProps(
+    { variants: "default" as const, size: "default" as const },
+    mainProps
+  );
 
   return (
     <button
       class={twJoin(
-      "rounded",
+        "rounded",
         buttonVariants[merged.variants],
         buttonSizes[merged.size],
         mainProps.class
