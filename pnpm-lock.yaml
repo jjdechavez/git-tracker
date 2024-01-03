@@ -82,6 +82,9 @@ importers:
       '@solidjs/router':
         specifier: ^0.10.5
         version: 0.10.5(solid-js@1.8.7)
+      solid-heroicons:
+        specifier: ^3.2.4
+        version: 3.2.4(solid-js@1.8.7)
       solid-js:
         specifier: ^1.8.7
         version: 1.8.7
@@ -6283,6 +6286,14 @@ packages:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 4.0.0
     dev: true
+
+  /solid-heroicons@3.2.4(solid-js@1.8.7):
+    resolution: {integrity: sha512-u6BMdFLvkJnvUGYzdFcWp1wvJ4hb9Y1zd3AbZ9D3bUmmiy9jBzNZX+RcqBCI2EKRvdQwAb1UB9bkESfqfhayDg==}
+    peerDependencies:
+      solid-js: '>= ^1.2.5'
+    dependencies:
+      solid-js: 1.8.7
+    dev: false
 
   /solid-js@1.8.7:
     resolution: {integrity: sha512-9dzrSVieh2zj3SnJ02II6xZkonR6c+j/91b7XZUNcC6xSaldlqjjGh98F1fk5cRJ8ZTkzqF5fPIWDxEOs6QZXA==}
