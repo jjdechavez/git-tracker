@@ -1,6 +1,7 @@
-import { mergeProps } from "solid-js";
+import { JSX, ParentProps, Show, mergeProps, splitProps } from "solid-js";
+import { twMerge } from "tailwind-merge";
 
-export const EmptyState = (props: { message: string }) => {
+export const EmptyState = (props: ParentProps & { message: string }) => {
   const merged = mergeProps({ message: "No data to show" }, props);
 
   return (
@@ -22,7 +23,18 @@ export const EmptyState = (props: { message: string }) => {
         <line x1="6" x2="6.01" y1="16" y2="16" />
         <line x1="10" x2="10.01" y1="16" y2="16" />
       </svg>
-      <p class="mt-5 text-sm text-gray-300">{merged.message}</p>
+      <p class="mt-5 text-sm">{merged.message}</p>
+      <Show when={props.children}>{props.children}</Show>
+    </div>
+  );
+};
+
+export const CTAWrapper = (props: JSX.HTMLAttributes<HTMLDivElement>) => {
+  const [mainProps, otherProps] = splitProps(props, ["children", "class"]);
+
+  return (
+    <div class={twMerge("mt-5", mainProps.class)} {...otherProps}>
+      {mainProps.children}
     </div>
   );
 };
