@@ -2,11 +2,9 @@ import { For, Match, Show, Switch, createSignal } from "solid-js";
 import { Navigate, Route, Router } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
-import { CTAWrapper, EmptyState } from "~/components/empty";
+import { EmptyState } from "~/components/empty";
 import { ListGroup, ListGroupItem } from "~/components/list-group";
 import { Button } from "~/components/button";
-import { Icon } from "solid-heroicons";
-import { plus } from "solid-heroicons/outline";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -37,13 +35,25 @@ function Overview() {
   return (
     <section>
       <div class="container p-5">
-        <div class="mb-10">
-          <h1 class="text-lg font-medium title-font text-white mb-2">
-            Overview
-          </h1>
-          <p class="text-base leading-relaxed">
-            View and manage your platforms
-          </p>
+        <div class="mb-10 flex items-center justify-between">
+          <hgroup>
+            <h1 class="text-lg font-medium title-font text-white mb-2">
+              Overview
+            </h1>
+            <p class="text-base leading-relaxed">
+              View and manage your platforms
+            </p>
+          </hgroup>
+
+          <div>
+            <Button
+              type="button"
+              size="sm"
+              class="inline-flex items-center gap-x-2"
+            >
+              New platform
+            </Button>
+          </div>
         </div>
 
         <Card>
@@ -54,14 +64,7 @@ function Overview() {
             <Show
               when={platforms().length > 0}
               fallback={
-                <EmptyState message="No platforms to show">
-                  <CTAWrapper>
-                    <Button type="button" size="sm" class="inline-flex items-center gap-x-2">
-                      <Icon path={plus} class="h-5 w-5" />
-                      New platform
-                    </Button>
-                  </CTAWrapper>
-                </EmptyState>
+                <EmptyState message="No platforms to show" class="md:p-7" />
               }
             >
               <ListGroup>

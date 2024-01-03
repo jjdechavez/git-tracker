@@ -1,13 +1,22 @@
-import { JSX, ParentProps, Show, mergeProps, splitProps } from "solid-js";
+import { JSX, Show, mergeProps, splitProps } from "solid-js";
 import { twMerge } from "tailwind-merge";
 
-export const EmptyState = (props: ParentProps & { message: string }) => {
+interface EmptyStateProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  message: string;
+}
+
+export const EmptyState = (props: EmptyStateProps) => {
   const merged = mergeProps({ message: "No data to show" }, props);
 
   return (
-    <div class="flex flex-auto flex-col justify-center items-center p-4 md:p-5">
+    <div
+      class={twMerge(
+        "text-center p-4 md:p-5",
+        props.class
+      )}
+    >
       <svg
-        class="w-10 h-10 text-gray-500"
+        class="w-10 h-10 text-gray-500 mx-auto"
         xmlns="http://www.w3.org/2000/svg"
         width="24"
         height="24"
