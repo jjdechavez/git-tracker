@@ -42,13 +42,13 @@ const RawProject = Info.pick({
 });
 type RawProject = z.infer<typeof RawProject>;
 
-const serializeProject = (project: RawProject) =>
+export const serialize = (project: RawProject) =>
   ({
     ...project,
     status: serializeStatus(project.status),
   } as const);
 
-export type SerializedProject = typeof serializeProject;
+export type SerializedProject = typeof serialize;
 
 export const findBySlug = z
   .function()
@@ -66,7 +66,7 @@ export const findBySlug = z
 
     if (!result) return undefined;
 
-    return serializeProject(result);
+    return result;
   });
 
 export const list = z
@@ -87,5 +87,5 @@ export const list = z
 
     const projects = await query.where("creator_id", "=", creatorId).execute();
 
-    return projects.map(serializeProject);
+    return projects;
   });

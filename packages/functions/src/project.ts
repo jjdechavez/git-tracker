@@ -60,7 +60,7 @@ export const slug = withApiAuth(async (_evt) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify(project),
+    body: JSON.stringify(Project.serialize(project)),
   };
 });
 
@@ -75,6 +75,6 @@ export const list = withApiAuth(async (_evt) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ data: projects }),
+    body: JSON.stringify({ data: projects.map(Project.serialize) }),
   };
 });
