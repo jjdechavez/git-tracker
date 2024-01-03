@@ -1,9 +1,12 @@
-import { Match, Switch } from "solid-js";
+import { For, Match, Show, Switch, createSignal } from "solid-js";
 import { Navigate, Route, Router } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
-import { EmptyState } from "~/components/empty";
+import { CTAWrapper, EmptyState } from "~/components/empty";
 import { ListGroup, ListGroupItem } from "~/components/list-group";
+import { Button } from "~/components/button";
+import { Icon } from "solid-heroicons";
+import { plus } from "solid-heroicons/outline";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -29,6 +32,8 @@ function Content() {
 }
 
 function Overview() {
+  const [platforms] = createSignal([]);
+
   return (
     <section>
       <div class="container p-5">
@@ -41,17 +46,30 @@ function Overview() {
           </p>
         </div>
 
-        {/* display list inspired from preline https://www.preline.co/examples/application-invoice.html */}
         <Card>
           <CardHeader>
             <CardTitle>Platforms</CardTitle>
           </CardHeader>
           <CardContent class="md:p-0">
-            <ListGroup>
-              <ListGroupItem>SFM</ListGroupItem>
-              <ListGroupItem>Freshy</ListGroupItem>
-              <ListGroupItem>ST</ListGroupItem>
-            </ListGroup>
+            <Show
+              when={platforms().length > 0}
+              fallback={
+                <EmptyState message="No platforms to show">
+                  <CTAWrapper>
+                    <Button type="button" size="sm" class="inline-flex items-center gap-x-2">
+                      <Icon path={plus} class="h-5 w-5" />
+                      New platform
+                    </Button>
+                  </CTAWrapper>
+                </EmptyState>
+              }
+            >
+              <ListGroup>
+                <For each={platforms()}>
+                  {(_) => <ListGroupItem>SFM</ListGroupItem>}
+                </For>
+              </ListGroup>
+            </Show>
           </CardContent>
         </Card>
       </div>
