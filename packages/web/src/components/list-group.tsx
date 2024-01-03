@@ -17,7 +17,7 @@ export const ListGroupItem = (props: JSX.HTMLAttributes<HTMLLIElement>) => {
   return (
     <li
       class={twMerge(
-        "inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium text-white -mt-px first:mt-0 last:mb-0",
+        "inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium text-white -mt-px first:mt-0 last:mb-0 hover:bg-gray-700/50",
         mainProps.class
       )}
       {...otherProps}
