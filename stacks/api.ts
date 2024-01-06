@@ -52,6 +52,18 @@ export function ApiStack({ stack }: StackContext) {
           description: "Get project by slug",
         },
       },
+      "POST /projects/{slug}/platforms": {
+        function: {
+          handler: "packages/functions/src/platform.create",
+          description: "Create platform from project",
+        },
+      },
+      "GET /platforms/{slug}": {
+        function: {
+          handler: "packages/functions/src/platform.slug",
+          description: "Get platform by slug",
+        },
+      },
     },
   });
 
