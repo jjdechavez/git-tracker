@@ -151,7 +151,7 @@ function Layout(props: ParentProps) {
   return (
     <div class="container mx-auto max-w-5xl px-6">
       <header>
-        <div class="container mx-auto flex flex-wrap p-5 flex-col justify-between md:flex-row items-center">
+        <div class="container p-5 flex flex-wrap flex-row items-center justify-between">
           <Switch>
             <Match when={data.loading}>
               <AvatarInitialsIcon text="." type="project" />
@@ -160,7 +160,7 @@ function Layout(props: ParentProps) {
             <Match when={!params.projectSlug}>
               <A
                 href="/projects"
-                class="flex title-font font-medium items-center text-white mb-4 md:mb-0"
+                class="flex title-font font-medium items-center text-white"
               >
                 <AvatarInitialsIcon text="git-tracker" type="project" />
               </A>
@@ -171,12 +171,12 @@ function Layout(props: ParentProps) {
             <Match when={params.projectSlug && data()}>
               <A
                 href={`/projects/${data()!.slug}`}
-                class="flex title-font font-medium items-center text-white mb-4 md:mb-0"
+                class="flex title-font font-medium items-center text-white"
               >
                 <AvatarInitialsIcon text={data()!.slug} type="project" />
               </A>
-              <nav class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-700	flex flex-wrap items-center text-base justify-center">
-                <a class="mr-5 hover:text-white">{data()?.slug}</a>
+              <nav class="border-l border-gray-700 flex flex-wrap items-center text-base justify-center mr-auto ml-4 py-1 pl-4 ">
+                <a class="hover:text-white">{data()?.slug}</a>
               </nav>
             </Match>
           </Switch>
@@ -186,7 +186,7 @@ function Layout(props: ParentProps) {
             class={twMerge(
               buttonVariants.secondary,
               buttonSizes.sm,
-              "inline-flex items-center mt-4 md:mt-0"
+              "inline-flex items-center"
             )}
           >
             Logout
