@@ -5,10 +5,12 @@ import { server } from "../util/server.env";
 
 import { UserTable } from "../user/user.sql";
 import { ProjectTable } from "../project/project.sql";
+import { PlatformTable } from "../platform/platform.sql";
 
 interface Database {
   user: UserTable;
   project: ProjectTable;
+  platform: PlatformTable;
 }
 
 const dialect = server.devMode
