@@ -1,7 +1,7 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 import { twJoin } from "tailwind-merge";
 
-interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   variants?: "default" | "secondary" | "link";
   size?: "default" | "sm" | "lg" | "icon";
 }
