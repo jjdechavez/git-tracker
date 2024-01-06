@@ -1,4 +1,5 @@
 import { JSX, children } from "solid-js";
+import { twJoin } from "tailwind-merge";
 
 interface InfoProps extends JSX.LabelHTMLAttributes<HTMLElement> {
   state: "info" | "error";
@@ -9,11 +10,12 @@ export function Info(props: InfoProps) {
 
   return (
     <small
-      class="leading-7 text-sm"
-      classList={{
-        "text-gray-400": props.state === "info",
-        "text-red-400": props.state === "error",
-      }}
+      class={twJoin(
+        "leading-7 text-sm block",
+        props.state === "info" && "text-gray-400",
+        props.state === "error" && "text-red-400",
+        props.class
+      )}
     >
       {content()}
     </small>

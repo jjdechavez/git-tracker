@@ -21,7 +21,7 @@ const createProjectAction = action(async (data: FormData) => {
 
 export function CreateProjectRoute() {
   return (
-    <section class="text-gray-400 bg-gray-900 body-font relative">
+    <section class="relative">
       <div class="container px-5 py-20 mx-auto">
         <div class="flex flex-col text-center w-full mb-10">
           <h1 class="text-lg font-medium title-font text-white mb-2">
