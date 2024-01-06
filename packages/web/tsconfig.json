@@ -22,8 +22,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@console/functions/*": ["../../functions/src/*"],
-      "@console/core/*": ["../../core/src/*"],
+      "@git-tracker/functions/*": ["../../functions/src/*"],
+      "@git-tracker/core/*": ["../../core/src/*"],
       "~/*": ["./src/*"]
     }
   },

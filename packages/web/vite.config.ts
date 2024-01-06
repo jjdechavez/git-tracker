@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [solid()],
   resolve: {
     alias: {
-      "@console/functions": path.resolve(__dirname, "../../functions/src"),
-      "@console/core": path.resolve(__dirname, "../../core/src"),
+      "@git-tracker/functions": path.resolve(__dirname, "../../functions/src"),
+      "@git-tracker/core": path.resolve(__dirname, "../../core/src"),
       "~": path.resolve(__dirname, "./src"),
     },
   },

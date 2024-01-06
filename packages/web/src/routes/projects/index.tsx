@@ -1,10 +1,11 @@
 import { For, Match, Show, Switch, createSignal } from "solid-js";
-import { Navigate, Route, Router } from "@solidjs/router";
+import { Navigate, useParams } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
 import { EmptyState } from "~/components/empty";
 import { ListGroup, ListGroupItem } from "~/components/list-group";
-import { Button } from "~/components/button";
+import { Link } from "~/components/link";
+import { ROUTES } from "~/App";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -15,21 +16,14 @@ export function ProjectsRoute() {
         <Navigate href={"/signin"} />
       </Match>
       <Match when={storage.value.token}>
-        <Content />
+        <Overview />
       </Match>
     </Switch>
   );
 }
 
-function Content() {
-  return (
-    <Router>
-      <Route path="*" component={Overview} />
-    </Router>
-  );
-}
-
 function Overview() {
+  const params = useParams();
   const [platforms] = createSignal([]);
 
   return (
@@ -46,13 +40,14 @@ function Overview() {
           </hgroup>
 
           <div>
-            <Button
+            <Link
+              href={ROUTES.CREATE_PLATFORM_ROUTE.set(params.projectSlug)}
               type="button"
               size="sm"
               class="inline-flex items-center gap-x-2"
             >
-              New platform
-            </Button>
+              New Platform
+            </Link>
           </div>
         </div>
 

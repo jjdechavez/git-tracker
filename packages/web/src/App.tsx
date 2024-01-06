@@ -8,22 +8,41 @@ import {
   A,
 } from "@solidjs/router";
 import { Match, ParentProps, Switch, createResource } from "solid-js";
-import SigninRoute from "./routes/signin";
 import { useStorage } from "./providers/storage";
-import { ProjectsRoute } from "./routes/projects";
-import { CreateProjectRoute } from "./routes/projects/create";
-import { AvatarInitialsIcon } from "./components/avatar";
 import { findProjectBySlug, listProjects } from "./data/project";
 import { twMerge } from "tailwind-merge";
 import { buttonSizes, buttonVariants } from "./components/button";
+
+import { SigninRoute } from "./routes/signin";
+import { ProjectsRoute } from "./routes/projects";
+import { CreatePlatformRoute } from "./routes/projects/platforms/create";
+import { CreateProjectRoute } from "./routes/projects/create";
+import { AvatarInitialsIcon } from "./components/avatar";
+
+export const ROUTES = {
+  SIGNIN_ROUTE: "/signin",
+  LOGOUT_ROUTE: "/logout",
+  OAUTH_GITHUB_ROUTE: "/oauth/github",
+  HOME_ROUTE: "/",
+  CREATE_PROJECT_ROUTE: "/projects/create",
+  PROJECT_SLUG_ROUTE: {
+    path: "/projects/:projectSlug",
+    set: (slug: string) => `/projects/${slug}` as const,
+  },
+  CREATE_PLATFORM_ROUTE: {
+    path: "/projects/:projectSlug/platforms/create",
+    set: (projectSlug: string) =>
+      `/projects/${projectSlug}/platforms/create` as const,
+  },
+} as const;
 
 function App() {
   return (
     <main class="min-h-screen text-gray-400 bg-gray-900 body-font">
       <Router>
-        <Route path="/signin" component={SigninRoute} />
+        <Route path={ROUTES.SIGNIN_ROUTE} component={SigninRoute} />
         <Route
-          path="/logout"
+          path={ROUTES.LOGOUT_ROUTE}
           component={() => {
             const storage = useStorage();
             localStorage.removeItem("session");
@@ -33,7 +52,7 @@ function App() {
           }}
         />
         <Route
-          path="/oauth/github"
+          path={ROUTES.OAUTH_GITHUB_ROUTE}
           component={() => {
             const storage = useStorage();
             const location = useLocation();
@@ -60,7 +79,7 @@ function App() {
         />
         <Route path="" component={Layout}>
           <Route
-            path="/"
+            path={ROUTES.HOME_ROUTE}
             component={() => {
               const [result] = createResource(listProjects);
 
@@ -81,7 +100,7 @@ function App() {
                       result()!.data!.data.length === 0
                     }
                   >
-                    <Navigate href="/projects" />
+                    <Navigate href={ROUTES.CREATE_PROJECT_ROUTE} />
                   </Match>
                   <Match
                     when={
@@ -90,17 +109,27 @@ function App() {
                     }
                   >
                     <Navigate
-                      href={`/projects/${
-                        result()?.data?.data.find((d) => d)?.slug
-                      }`}
+                      href={ROUTES.PROJECT_SLUG_ROUTE.set(
+                        result()!.data!.data.find((d) => d)!.slug
+                      )}
                     />
                   </Match>
                 </Switch>
               );
             }}
           />
-          <Route path="/projects" component={CreateProjectRoute} />
-          <Route path="/projects/:projectSlug" component={ProjectsRoute} />
+          <Route
+            path={ROUTES.CREATE_PROJECT_ROUTE}
+            component={CreateProjectRoute}
+          />
+          <Route
+            path={ROUTES.PROJECT_SLUG_ROUTE.path}
+            component={ProjectsRoute}
+          />
+          <Route
+            path={ROUTES.CREATE_PLATFORM_ROUTE.path}
+            component={CreatePlatformRoute}
+          />
           <Route path="*" component={() => <h1>Not found</h1>} />
         </Route>
       </Router>
@@ -154,7 +183,11 @@ function Layout(props: ParentProps) {
 
           <a
             href="/logout"
-            class={twMerge(buttonVariants.secondary, buttonSizes.sm, "inline-flex items-center mt-4 md:mt-0")}
+            class={twMerge(
+              buttonVariants.secondary,
+              buttonSizes.sm,
+              "inline-flex items-center mt-4 md:mt-0"
+            )}
           >
             Logout
           </a>

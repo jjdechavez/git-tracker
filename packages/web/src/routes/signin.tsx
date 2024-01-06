@@ -1,8 +1,9 @@
 import { Match, Switch } from "solid-js";
 import { useStorage } from "../providers/storage";
 import { Navigate } from "@solidjs/router";
+import { ROUTES } from "~/App";
 
-export default function SigninRoute() {
+export function SigninRoute() {
   const storage = useStorage();
 
   return (
@@ -36,7 +37,7 @@ export default function SigninRoute() {
         </section>
       </Match>
       <Match when={storage.value.token}>
-        <Navigate href="/projects" />
+        <Navigate href={ROUTES.HOME_ROUTE} />
       </Match>
     </Switch>
   );
