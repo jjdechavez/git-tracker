@@ -1,4 +1,4 @@
-import { useJsonBody, usePathParam } from "sst/node/api";
+import { useJsonBody, usePathParam, useQueryParams } from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Platform } from "@git-tracker/core/platform";
 import {
@@ -90,5 +90,23 @@ export const slug = withApiAuth(async (_evt) => {
   return {
     statusCode: 200,
     body: JSON.stringify(Platform.serialize(platform)),
+  };
+});
+
+export const list = withApiAuth(async (_evt) => {
+  const session = useSession();
+
+  if (session.type !== "user") {
+    throw new UnauthorizedResponse();
+  }
+
+  const sessionID = session.properties.userID;
+  const queryParams = useQueryParams();
+
+  const platforms = await Platform.list(sessionID, queryParams);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ data: platforms.map(Platform.serialize) }),
   };
 });

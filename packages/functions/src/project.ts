@@ -50,8 +50,10 @@ export const slug = withApiAuth(async (_evt) => {
     throw new UnauthorizedResponse();
   }
 
+  const sessionID = session.properties.userID;
+
   const project = await Project.findBySlug(slug, {
-    creator_id: session.properties.userID,
+    creator_id: sessionID,
   });
 
   if (!project) {

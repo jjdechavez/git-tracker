@@ -58,6 +58,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Create platform from project",
         },
       },
+      "GET /platforms": {
+        function: {
+          handler: "packages/functions/src/platform.list",
+          description: "List platforms",
+        },
+      },
       "GET /platforms/{slug}": {
         function: {
           handler: "packages/functions/src/platform.slug",
