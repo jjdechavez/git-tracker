@@ -4,13 +4,13 @@ import {
   createForm,
   required,
 } from "@modular-forms/solid";
-import { redirect, useNavigate, useParams } from "@solidjs/router";
-import { Show } from "solid-js";
+import { useNavigate, useParams } from "@solidjs/router";
 import { ROUTES } from "~/App";
 import { Button } from "~/components/button";
-import { Info } from "~/components/form/info";
-import { Input } from "~/components/form/input";
-import { Label } from "~/components/form/label";
+import {
+  ModularControl,
+  ModularTextInput,
+} from "~/components/form/modular/text-field";
 import { NewPlatform, createPlatform } from "~/data/platform";
 
 export function CreatePlatformRoute() {
@@ -49,30 +49,29 @@ export function CreatePlatformRoute() {
               validate={[required("Please enter platform name.")]}
             >
               {(field, props) => (
-                <div class="p-2 w-full">
-                  <Label for={props.name} required>
-                    Name
-                  </Label>
-                  <Input {...props} autofocus={true} type="text" required />
-                  <Info state="info">
-                    Needs to be lowercase, unique, and URL friendly.
-                  </Info>
-                  <Show when={field.error}>
-                    <Info state="error">{field.error}</Info>
-                  </Show>
-                </div>
+                <ModularControl fullWidth>
+                  <ModularTextInput
+                    {...props}
+                    type="text"
+                    value={field.value}
+                    error={field.error}
+                    required
+                    info="Needs to be lowercase, unique, and URL friendly."
+                  />
+                </ModularControl>
               )}
             </Field>
             <Field name="prefixTicket">
               {(field, props) => (
-                <div class="p-2 w-full">
-                  <Label for={props.name}>Prefix Ticket</Label>
-                  <Input {...props} type="text" />
-                  <Info state="info">This would be use as ticket prefix.</Info>
-                  <Show when={field.error}>
-                    <Info state="error">{field.error}</Info>
-                  </Show>
-                </div>
+                <ModularControl fullWidth>
+                  <ModularTextInput
+                    {...props}
+                    type="text"
+                    value={field.value || ""}
+                    error={field.error}
+                    info="This would be use as ticket prefix."
+                  />
+                </ModularControl>
               )}
             </Field>
             <div class="p-2 w-full">
