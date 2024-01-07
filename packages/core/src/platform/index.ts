@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "../kysely";
 import { PlatformStatuses } from "./platform.sql";
 import { kebabCase, serializeStatus } from "../util/sql";
-import { idSchema } from "../util/zod";
+import { idSchema, statusSchema } from "../util/zod";
 
 export const Info = z.object({
   id: z.number(),
@@ -46,7 +46,7 @@ const RawProject = Info.pick({
   name: true,
   slug: true,
   status: true,
-  prefix_ticket: true
+  prefix_ticket: true,
 });
 type RawProject = z.infer<typeof RawProject>;
 
@@ -81,4 +81,44 @@ export const findBySlug = z
     if (!result) return undefined;
 
     return result;
+  });
+
+export const list = z
+  .function()
+  .args(
+    idSchema,
+    z
+      .object({
+        slug: Info.shape.slug,
+        status: statusSchema,
+        project_id: idSchema,
+      })
+      .partial()
+  )
+  .implement(async (creatorId, criteria) => {
+    let query = db
+      .selectFrom("platform")
+      .select([
+        "platform.id",
+        "platform.name",
+        "platform.slug",
+        "platform.status",
+        "platform.prefix_ticket",
+      ]);
+
+    if (criteria.slug) {
+      query = query.where("slug", "like", kebabCase(criteria.slug));
+    }
+
+    if (criteria.status) {
+      query = query.where("status", "=", criteria.status);
+    }
+
+    if (criteria.project_id) {
+      query = query.where("project_id", "=", criteria.project_id);
+    }
+
+    const platforms = await query.where("creator_id", "=", creatorId).execute();
+
+    return platforms;
   });

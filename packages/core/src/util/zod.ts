@@ -15,3 +15,7 @@ export function zod<
 export const idSchema = z
   .union([z.string(), z.number()])
   .pipe(z.coerce.number());
+
+export const statusSchema = z
+  .enum(["active", "inactive"])
+  .transform((val) => (val === "active" ? 1 : 0));
