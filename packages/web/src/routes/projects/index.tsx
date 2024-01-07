@@ -1,11 +1,20 @@
-import { For, Match, Show, Switch, createSignal } from "solid-js";
+import {
+  For,
+  Match,
+  Show,
+  Switch,
+  createResource,
+  createSignal,
+} from "solid-js";
 import { Navigate, useParams } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
-import { EmptyState } from "~/components/empty";
+import { EmptyState, LoadingState } from "~/components/state";
 import { ListGroup, ListGroupItem } from "~/components/list-group";
 import { Link } from "~/components/link";
 import { ROUTES } from "~/App";
+import { listPlatforms } from "~/data/platform";
+import { useProject } from "~/providers/project";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -24,7 +33,13 @@ export function ProjectsRoute() {
 
 function Overview() {
   const params = useParams();
-  const [platforms] = createSignal([]);
+  const [test] = createSignal([]);
+  const project = useProject();
+
+  const [platforms] = createResource(
+    () => ({ project_id: project.id.toString() }),
+    listPlatforms
+  );
 
   return (
     <section>
@@ -51,24 +66,34 @@ function Overview() {
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-4 md:flex-row">
+        <div class="flex flex-col items-start gap-4 md:flex-row">
           <Card class="flex-1 w-full">
             <CardHeader>
               <CardTitle>Platforms</CardTitle>
             </CardHeader>
             <CardContent class="md:p-0">
-              <Show
-                when={platforms().length > 0}
-                fallback={
+              <Switch>
+                <Match when={platforms.state === "pending"}>
+                  <LoadingState
+                    message="Fetching platforms from the server"
+                    class="md:p-7"
+                  />
+                </Match>
+                <Match
+                  when={platforms.state === "ready" && platforms().length === 0}
+                >
                   <EmptyState message="No platforms to show" class="md:p-7" />
-                }
-              >
-                <ListGroup>
+                </Match>
+                <Match
+                  when={platforms.state === "ready" && platforms().length > 0}
+                >
                   <For each={platforms()}>
-                    {(_) => <ListGroupItem>SFM</ListGroupItem>}
+                    {(platform) => (
+                      <ListGroupItem>{platform.name}</ListGroupItem>
+                    )}
                   </For>
-                </ListGroup>
-              </Show>
+                </Match>
+              </Switch>
             </CardContent>
           </Card>
 
@@ -78,7 +103,7 @@ function Overview() {
             </CardHeader>
             <CardContent class="md:p-0">
               <Show
-                when={platforms().length > 0}
+                when={test().length > 0}
                 fallback={
                   <EmptyState
                     message="No production pull request to show"
@@ -87,7 +112,7 @@ function Overview() {
                 }
               >
                 <ListGroup>
-                  <For each={platforms()}>
+                  <For each={test()}>
                     {(_) => <ListGroupItem>SFM</ListGroupItem>}
                   </For>
                 </ListGroup>

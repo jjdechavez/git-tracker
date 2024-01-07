@@ -18,6 +18,7 @@ import { ProjectsRoute } from "./routes/projects";
 import { CreatePlatformRoute } from "./routes/projects/platforms/create";
 import { CreateProjectRoute } from "./routes/projects/create";
 import { AvatarInitialsIcon } from "./components/avatar";
+import { ProjectProvider } from "./providers/project";
 
 export const ROUTES = {
   SIGNIN_ROUTE: "/signin",
@@ -137,6 +138,21 @@ function App() {
   );
 }
 
+function LogoutButton() {
+  return (
+    <a
+      href="/logout"
+      class={twMerge(
+        buttonVariants.secondary,
+        buttonSizes.sm,
+        "inline-flex items-center"
+      )}
+    >
+      Logout
+    </a>
+  );
+}
+
 function Layout(props: ParentProps) {
   const storage = useStorage();
   const navigate = useNavigate();
@@ -150,25 +166,33 @@ function Layout(props: ParentProps) {
 
   return (
     <div class="container mx-auto max-w-5xl px-6">
-      <header>
-        <div class="container p-5 flex flex-wrap flex-row items-center justify-between">
-          <Switch>
-            <Match when={data.loading}>
-              <AvatarInitialsIcon text="." type="project" />
-            </Match>
-            <Match when={data.error}>Fetched error: {data.error}</Match>
-            <Match when={!params.projectSlug}>
+      <Switch>
+        <Match when={data.state === "pending"}>Loading..</Match>
+        <Match when={data.state === "errored"}>
+          Fetched error: {data.error}
+        </Match>
+        <Match when={!params.projectSlug}>
+          <header>
+            <div class="container p-5 flex flex-wrap flex-row items-center justify-between">
               <A
-                href="/projects"
+                href="/"
                 class="flex title-font font-medium items-center text-white"
               >
                 <AvatarInitialsIcon text="git-tracker" type="project" />
               </A>
-              <nav class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-700	flex flex-wrap items-center text-base justify-center">
-                <a class="mr-5 hover:text-white">Git Tracker</a>
+              <nav class="border-l border-gray-700 flex flex-wrap items-center text-base justify-center mr-auto ml-4 py-1 pl-4 ">
+                <a class="hover:text-white">Git Tracker</a>
               </nav>
-            </Match>
-            <Match when={params.projectSlug && data()}>
+
+              <LogoutButton />
+            </div>
+          </header>
+
+          {props.children}
+        </Match>
+        <Match when={params.projectSlug && data.state === "ready"}>
+          <header>
+            <div class="container p-5 flex flex-wrap flex-row items-center justify-between">
               <A
                 href={`/projects/${data()!.slug}`}
                 class="flex title-font font-medium items-center text-white"
@@ -178,23 +202,14 @@ function Layout(props: ParentProps) {
               <nav class="border-l border-gray-700 flex flex-wrap items-center text-base justify-center mr-auto ml-4 py-1 pl-4 ">
                 <a class="hover:text-white">{data()?.slug}</a>
               </nav>
-            </Match>
-          </Switch>
 
-          <a
-            href="/logout"
-            class={twMerge(
-              buttonVariants.secondary,
-              buttonSizes.sm,
-              "inline-flex items-center"
-            )}
-          >
-            Logout
-          </a>
-        </div>
-      </header>
+              <LogoutButton />
+            </div>
+          </header>
 
-      {props.children}
+          <ProjectProvider project={data()!}>{props.children}</ProjectProvider>
+        </Match>
+      </Switch>
     </div>
   );
 }

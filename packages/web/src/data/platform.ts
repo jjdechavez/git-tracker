@@ -6,6 +6,14 @@ export type NewPlatform = {
   prefixTicket: string | null;
 };
 
+export const platformSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.enum(["inactive", "active"]),
+  prefix_ticket: z.string().nullable(),
+});
+
 export const createPlatform = async (
   projectSlug: string,
   newPlatform: NewPlatform
@@ -24,18 +32,35 @@ export const createPlatform = async (
 };
 
 export const findPlatformBySlug = async (slug: string) => {
-  const schema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string(),
-    status: z.enum(["inactive", "active"]),
-    prefix_ticket: z.string().nullable(),
-  });
-
   const platform = await externalApi()
     .url(`/projects/${slug}`)
     .get()
-    .json(schema.parse);
+    .json(platformSchema.parse);
 
   return platform;
+};
+
+export type SearchPlatforms = {
+  slug: string;
+  status: "active" | "inactive";
+  project_id: string;
+};
+
+export const listPlatforms = async (search: Partial<SearchPlatforms>) => {
+  const schema = z.object({
+    data: z.array(platformSchema),
+  });
+
+  const searchParams = new URLSearchParams(search);
+  const params =
+    searchParams.toString().length === 0
+      ? searchParams.toString()
+      : `?${searchParams.toString()}`;
+
+  const projects = await externalApi()
+    .url(`/platforms${params}`)
+    .get()
+    .json(schema.parse);
+
+  return projects.data;
 };

@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { externalApi } from ".";
 
+const projectSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.enum(["inactive", "active"]),
+});
+
+export type Project = z.infer<typeof projectSchema>;
+
 export const createProject = async (name: string) => {
   const schema = z.object({
     slug: z.string(),
@@ -17,14 +26,7 @@ export const createProject = async (name: string) => {
 
 export const listProjects = async () => {
   const schema = z.object({
-    data: z.array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-        slug: z.string(),
-        status: z.enum(["inactive", "active"]),
-      })
-    ),
+    data: z.array(projectSchema),
   });
 
   const projects = await externalApi()
