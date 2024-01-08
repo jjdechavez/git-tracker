@@ -35,6 +35,11 @@ export const ROUTES = {
     set: (projectSlug: string) =>
       `/projects/${projectSlug}/platforms/create` as const,
   },
+  PLATFORM_SLUG_ROUTE: {
+    path: "/projects/:projectSlug",
+    set: (projectSlug: string, platformSlug: string) =>
+      `/projects/${projectSlug}/platforms/${platformSlug}` as const,
+  },
 } as const;
 
 function App() {
@@ -190,7 +195,7 @@ function Layout(props: ParentProps) {
 
           {props.children}
         </Match>
-        <Match when={params.projectSlug && data.state === "ready"}>
+        <Match when={params.projectSlug && data.state === "ready" && data()}>
           <header>
             <div class="container p-5 flex flex-wrap flex-row items-center justify-between">
               <A
@@ -200,7 +205,7 @@ function Layout(props: ParentProps) {
                 <AvatarInitialsIcon text={data()!.slug} type="project" />
               </A>
               <nav class="border-l border-gray-700 flex flex-wrap items-center text-base justify-center mr-auto ml-4 py-1 pl-4 ">
-                <a class="hover:text-white">{data()?.slug}</a>
+                <a class="hover:text-white">{data()!.slug}</a>
               </nav>
 
               <LogoutButton />

@@ -1,6 +1,7 @@
 import {
   For,
   Match,
+  ParentProps,
   Show,
   Switch,
   createResource,
@@ -10,7 +11,11 @@ import { Navigate, useParams } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
 import { EmptyState, LoadingState } from "~/components/state";
-import { ListGroup, ListGroupItem } from "~/components/list-group";
+import {
+  ListGroup,
+  ListGroupAnchorItem,
+  ListGroupItem,
+} from "~/components/list-group";
 import { Link } from "~/components/link";
 import { ROUTES } from "~/App";
 import { listPlatforms } from "~/data/platform";
@@ -34,12 +39,6 @@ export function ProjectsRoute() {
 function Overview() {
   const params = useParams();
   const [test] = createSignal([]);
-  const project = useProject();
-
-  const [platforms] = createResource(
-    () => ({ project_id: project.id.toString() }),
-    listPlatforms
-  );
 
   return (
     <section>
@@ -67,35 +66,7 @@ function Overview() {
         </div>
 
         <div class="flex flex-col items-start gap-4 md:flex-row">
-          <Card class="flex-1 w-full">
-            <CardHeader>
-              <CardTitle>Platforms</CardTitle>
-            </CardHeader>
-            <CardContent class="md:p-0">
-              <Switch>
-                <Match when={platforms.state === "pending"}>
-                  <LoadingState
-                    message="Fetching platforms from the server"
-                    class="md:p-7"
-                  />
-                </Match>
-                <Match
-                  when={platforms.state === "ready" && platforms().length === 0}
-                >
-                  <EmptyState message="No platforms to show" class="md:p-7" />
-                </Match>
-                <Match
-                  when={platforms.state === "ready" && platforms().length > 0}
-                >
-                  <For each={platforms()}>
-                    {(platform) => (
-                      <ListGroupItem>{platform.name}</ListGroupItem>
-                    )}
-                  </For>
-                </Match>
-              </Switch>
-            </CardContent>
-          </Card>
+          <Platforms />
 
           <Card class="flex-1 w-full">
             <CardHeader>
@@ -152,5 +123,61 @@ function DataList() {
         </a>
       </div>
     </div>
+  );
+}
+
+function OutlineBadge(props: ParentProps) {
+  return (
+    <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded text-xs font-medium border border-gray-600 text-white">
+      {props.children}
+    </span>
+  );
+}
+
+function Platforms() {
+  const project = useProject();
+
+  const [platforms] = createResource(
+    () => ({ project_id: project.id.toString() }),
+    listPlatforms
+  );
+
+  return (
+    <Card class="flex-1 w-full">
+      <CardHeader>
+        <CardTitle>Platforms</CardTitle>
+      </CardHeader>
+      <CardContent class="md:p-0">
+        <Switch>
+          <Match when={platforms.state === "pending"}>
+            <LoadingState
+              message="Fetching platforms from the server"
+              class="md:p-7"
+            />
+          </Match>
+          <Match when={platforms.state === "ready" && platforms().length === 0}>
+            <EmptyState message="No platforms to show" class="md:p-7" />
+          </Match>
+          <Match when={platforms.state === "ready" && platforms().length > 0}>
+            <ListGroup>
+              <For each={platforms()}>
+                {(platform) => (
+                  <ListGroupAnchorItem
+                    href={ROUTES.PLATFORM_SLUG_ROUTE.set(
+                      project.slug,
+                      platform.slug
+                    )}
+                    class="justify-between"
+                  >
+                    <span>{platform.name}</span>
+                    <OutlineBadge>{platform.prefix_ticket}</OutlineBadge>
+                  </ListGroupAnchorItem>
+                )}
+              </For>
+            </ListGroup>
+          </Match>
+        </Switch>
+      </CardContent>
+    </Card>
   );
 }
