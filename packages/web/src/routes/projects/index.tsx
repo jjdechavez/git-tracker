@@ -1,7 +1,6 @@
 import {
   For,
   Match,
-  ParentProps,
   Show,
   Switch,
   createResource,
@@ -20,6 +19,7 @@ import { Link } from "~/components/link";
 import { ROUTES } from "~/App";
 import { listPlatforms } from "~/data/platform";
 import { useProject } from "~/providers/project";
+import { OutlineBadge } from "~/components/badge";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -123,14 +123,6 @@ function DataList() {
         </a>
       </div>
     </div>
-  );
-}
-
-function OutlineBadge(props: ParentProps) {
-  return (
-    <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded text-xs font-medium border border-gray-600 text-white">
-      {props.children}
-    </span>
   );
 }
 

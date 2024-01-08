@@ -19,6 +19,7 @@ import { CreatePlatformRoute } from "./routes/projects/platforms/create";
 import { CreateProjectRoute } from "./routes/projects/create";
 import { AvatarInitialsIcon } from "./components/avatar";
 import { ProjectProvider } from "./providers/project";
+import { ProjectTicketsRoute } from "./routes/projects/tickets";
 
 export const ROUTES = {
   SIGNIN_ROUTE: "/signin",
@@ -30,15 +31,19 @@ export const ROUTES = {
     path: "/projects/:projectSlug",
     set: (slug: string) => `/projects/${slug}` as const,
   },
+  TICKETS_ROUTE: {
+    path: "/projects/:projectSlug/tickets",
+    set: (projectSlug: string) => `/projects/${projectSlug}/tickets` as const,
+  },
   CREATE_PLATFORM_ROUTE: {
     path: "/projects/:projectSlug/platforms/create",
     set: (projectSlug: string) =>
       `/projects/${projectSlug}/platforms/create` as const,
   },
   PLATFORM_SLUG_ROUTE: {
-    path: "/projects/:projectSlug",
+    path: "/projects/:projectSlug/tickets",
     set: (projectSlug: string, platformSlug: string) =>
-      `/projects/${projectSlug}/platforms/${platformSlug}` as const,
+      `/projects/${projectSlug}/tickets?platform=${platformSlug}` as const,
   },
 } as const;
 
@@ -135,6 +140,10 @@ function App() {
           <Route
             path={ROUTES.CREATE_PLATFORM_ROUTE.path}
             component={CreatePlatformRoute}
+          />
+          <Route
+            path={ROUTES.TICKETS_ROUTE.path}
+            component={ProjectTicketsRoute}
           />
           <Route path="*" component={() => <h1>Not found</h1>} />
         </Route>
