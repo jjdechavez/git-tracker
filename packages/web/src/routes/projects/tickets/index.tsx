@@ -1,6 +1,8 @@
 import { useSearchParams } from "@solidjs/router";
 import { Show } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
+import { Card, CardContent } from "~/components/card";
+import { EmptyState } from "~/components/state";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,6 +29,14 @@ export function ProjectTicketsRoute() {
           </OutlineBadge>
         </p>
       </Show>
+
+      <div class="mt-8">
+        <Card>
+          <CardContent class="md:p-0">
+            <EmptyState message="No tickets to show" class="md:p-7" />
+          </CardContent>
+        </Card>
+      </div>
     </section>
   );
 }
