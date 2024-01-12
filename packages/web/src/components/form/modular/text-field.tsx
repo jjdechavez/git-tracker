@@ -1,4 +1,4 @@
-import { JSX, Show, splitProps } from "solid-js";
+import { JSX, Show, createMemo, splitProps } from "solid-js";
 import { twJoin } from "tailwind-merge";
 import { Label } from "../label";
 import { Input } from "../input";
@@ -26,7 +26,17 @@ export function ModularTextInput(props: TextFieldProps) {
   const [rootProps, inputProps] = splitProps(
     props,
     ["name", "value", "required", "disabled"],
-    ["placeholder", "ref", "onInput", "onChange", "onBlur", "autofocus"]
+    ["placeholder", "ref", "onInput", "onChange", "onBlur", "autofocus", "name"]
+  );
+
+  const getValue = createMemo<string | number | undefined>(
+    (prevValue) =>
+      props.value === undefined
+        ? ""
+        : !Number.isNaN(props.value)
+        ? props.value
+        : prevValue,
+    ""
   );
 
   return (
@@ -36,7 +46,14 @@ export function ModularTextInput(props: TextFieldProps) {
           {props.label}
         </Label>
       </Show>
-      <Input {...inputProps} type={props.type} required={rootProps.required} />
+      <Input
+        {...inputProps}
+        value={getValue()}
+        type={props.type}
+        required={rootProps.required}
+        aria-invalid={!!props.error}
+        aria-errormessage={`${props.name}-error`}
+      />
       <Show when={props.info}>
         <Info state="info">{props.info}</Info>
       </Show>
