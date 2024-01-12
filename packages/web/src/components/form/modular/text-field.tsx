@@ -76,7 +76,10 @@ export function ModularControl(props: ModularControlProps) {
   ]);
 
   return (
-    <div class={twJoin("p-2", mainProps.fullWidth && "w-full")} {...otherProps}>
+    <div
+      class={twJoin("p-2", mainProps.fullWidth && "w-full", mainProps.class)}
+      {...otherProps}
+    >
       {mainProps.children}
     </div>
   );
