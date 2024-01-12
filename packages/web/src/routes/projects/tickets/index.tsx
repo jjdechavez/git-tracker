@@ -99,7 +99,10 @@ function Tickets() {
   return (
     <Card>
       <CardContent>
-        <Form onSubmit={(values) => console.log("submit", values)}>
+        <Form
+          onSubmit={(values) => console.log("submit", values)}
+          onChange={(values) => console.log("change: uses event", values)}
+        >
           <FieldArray name="tickets">
             {(tickets) => (
               <Show
@@ -163,14 +166,33 @@ function Tickets() {
                           <>
                             <For each={commits.items}>
                               {(_, index) => (
-                                <div class="flex">
+                                <div class="grid gap-x-2 grid-cols-4 sm:grid-cols-6 divide divide-slate-800">
+                                  <Field
+                                    name={`${
+                                      commits.name
+                                    }.${index()}.commitedAt`}
+                                  >
+                                    {(field, props) => (
+                                      <ModularControl class="col-span-2 sm:col-span-1">
+                                        <ModularTextInput
+                                          {...props}
+                                          value={field.value}
+                                          error={field.error}
+                                          type="text"
+                                          label="Commited At"
+                                          required
+                                        />
+                                      </ModularControl>
+                                    )}
+                                  </Field>
+
                                   <Field
                                     name={`${
                                       commits.name
                                     }.${index()}.platformId`}
                                   >
                                     {(field, props) => (
-                                      <ModularControl class="flex-initial w-36">
+                                      <ModularControl class="col-span-2 sm:col-span-1">
                                         <ModularTextInput
                                           {...props}
                                           value={field.value}
@@ -187,7 +209,7 @@ function Tickets() {
                                     name={`${commits.name}.${index()}.hashed`}
                                   >
                                     {(field, props) => (
-                                      <ModularControl class="flex-initial w-36">
+                                      <ModularControl class="col-span-2 sm:col-span-1">
                                         <ModularTextInput
                                           {...props}
                                           value={field.value}
@@ -204,32 +226,13 @@ function Tickets() {
                                     name={`${commits.name}.${index()}.message`}
                                   >
                                     {(field, props) => (
-                                      <ModularControl class="flex-auto w-64">
+                                      <ModularControl class="col-span-2 sm:col-span-3">
                                         <ModularTextInput
                                           {...props}
                                           value={field.value}
                                           error={field.error}
                                           type="text"
                                           label="Message"
-                                        />
-                                      </ModularControl>
-                                    )}
-                                  </Field>
-
-                                  <Field
-                                    name={`${
-                                      commits.name
-                                    }.${index()}.commitedAt`}
-                                  >
-                                    {(field, props) => (
-                                      <ModularControl class="flex-initial w-36">
-                                        <ModularTextInput
-                                          {...props}
-                                          value={field.value}
-                                          error={field.error}
-                                          type="text"
-                                          label="Commited At"
-                                          required
                                         />
                                       </ModularControl>
                                     )}
