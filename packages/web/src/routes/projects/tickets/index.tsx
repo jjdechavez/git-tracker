@@ -47,7 +47,12 @@ type TicketForm = {
   tickets: {
     name: string;
     description?: string;
-    commits: never[];
+    commits: Array<{
+      platformId: string;
+      hashed: string;
+      message?: string;
+      commitedAt: string;
+    }>;
   }[];
 };
 
@@ -56,12 +61,32 @@ const initialValues = {
     {
       name: "FRS-807",
       description: "[Buyer] Packing list pdf",
-      commits: [],
+      commits: [
+        {
+          platformId: "1",
+          hashed: "42386b",
+          message: "Updated delivery address",
+          commitedAt: "2024-01-12",
+        },
+        {
+          platformId: "1",
+          hashed: "kh9321",
+          message: "Implement barcode by order number",
+          commitedAt: "2024-01-12",
+        },
+      ],
     },
     {
       name: "FRS-812",
       description: "[Buyer] Revamp order summary pdf",
-      commits: [],
+      commits: [
+        {
+          platformId: "2",
+          hashed: "321jk3",
+          message: "Updated barcode label",
+          commitedAt: "2024-01-10",
+        },
+      ],
     },
   ],
 };
@@ -101,36 +126,139 @@ function Tickets() {
               >
                 <For each={tickets.items}>
                   {(_, index) => (
-                    <div class="flex">
-                      <Field name={`${tickets.name}.${index()}.name`}>
-                        {(field, props) => (
-                          <ModularControl class="flex-initial w-32">
-                            <ModularTextInput
-                              {...props}
-                              value={field.value}
-                              error={field.error}
-                              type="text"
-                              label="Ticket Name"
-                              required
-                            />
-                          </ModularControl>
-                        )}
-                      </Field>
+                    <>
+                      <div class="flex">
+                        <Field name={`${tickets.name}.${index()}.name`}>
+                          {(field, props) => (
+                            <ModularControl class="flex-initial w-36">
+                              <ModularTextInput
+                                {...props}
+                                value={field.value}
+                                error={field.error}
+                                type="text"
+                                label="Ticket Name"
+                                required
+                              />
+                            </ModularControl>
+                          )}
+                        </Field>
 
-                      <Field name={`${tickets.name}.${index()}.description`}>
-                        {(field, props) => (
-                          <ModularControl class="flex-auto w-64">
-                            <ModularTextInput
-                              {...props}
-                              value={field.value}
-                              error={field.error}
-                              type="text"
-                              label="Description"
-                            />
-                          </ModularControl>
+                        <Field name={`${tickets.name}.${index()}.description`}>
+                          {(field, props) => (
+                            <ModularControl class="flex-auto w-64">
+                              <ModularTextInput
+                                {...props}
+                                value={field.value}
+                                error={field.error}
+                                type="text"
+                                label="Description"
+                              />
+                            </ModularControl>
+                          )}
+                        </Field>
+                      </div>
+
+                      <FieldArray name={`${tickets.name}.${index()}.commits`}>
+                        {(commits) => (
+                          <>
+                            <For each={commits.items}>
+                              {(_, index) => (
+                                <div class="flex">
+                                  <Field
+                                    name={`${
+                                      commits.name
+                                    }.${index()}.platformId`}
+                                  >
+                                    {(field, props) => (
+                                      <ModularControl class="flex-initial w-36">
+                                        <ModularTextInput
+                                          {...props}
+                                          value={field.value}
+                                          error={field.error}
+                                          type="text"
+                                          label="Commit platform"
+                                          required
+                                        />
+                                      </ModularControl>
+                                    )}
+                                  </Field>
+
+                                  <Field
+                                    name={`${commits.name}.${index()}.hashed`}
+                                  >
+                                    {(field, props) => (
+                                      <ModularControl class="flex-initial w-36">
+                                        <ModularTextInput
+                                          {...props}
+                                          value={field.value}
+                                          error={field.error}
+                                          type="text"
+                                          label="Hashed"
+                                          required
+                                        />
+                                      </ModularControl>
+                                    )}
+                                  </Field>
+
+                                  <Field
+                                    name={`${commits.name}.${index()}.message`}
+                                  >
+                                    {(field, props) => (
+                                      <ModularControl class="flex-auto w-64">
+                                        <ModularTextInput
+                                          {...props}
+                                          value={field.value}
+                                          error={field.error}
+                                          type="text"
+                                          label="Message"
+                                        />
+                                      </ModularControl>
+                                    )}
+                                  </Field>
+
+                                  <Field
+                                    name={`${
+                                      commits.name
+                                    }.${index()}.commitedAt`}
+                                  >
+                                    {(field, props) => (
+                                      <ModularControl class="flex-initial w-36">
+                                        <ModularTextInput
+                                          {...props}
+                                          value={field.value}
+                                          error={field.error}
+                                          type="text"
+                                          label="Commited At"
+                                          required
+                                        />
+                                      </ModularControl>
+                                    )}
+                                  </Field>
+                                </div>
+                              )}
+                            </For>
+
+                            <div class="p-2 flex flex-wrap gap-4">
+                              <Button
+                                type="button"
+                                onClick={() =>
+                                  insert(ticketsForm, commits.name, {
+                                    value: {
+                                      platformId: "",
+                                      hashed: "",
+                                      message: "",
+                                      commitedAt: "",
+                                    },
+                                  })
+                                }
+                              >
+                                Add commit
+                              </Button>
+                            </div>
+                          </>
                         )}
-                      </Field>
-                    </div>
+                      </FieldArray>
+                    </>
                   )}
                 </For>
               </Show>
