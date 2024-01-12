@@ -17,7 +17,7 @@ export function CloseButtonBadge(props: JSX.HTMLAttributes<HTMLButtonElement>) {
       {...otherProps}
       type="button"
       class={twMerge(
-        "flex-shrink-0 h-4 w-4 inline-flex items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none focus:bg-blue-200 focus:text-blue-500 dark:hover:bg-blue-900",
+        "flex-shrink-0 h-4 w-4 inline-flex items-center justify-center rounded-full bg-slate-700/50 hover:bg-slate-700 text-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400",
         mainProps.class
       )}
     >
