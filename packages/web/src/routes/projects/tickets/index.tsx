@@ -1,4 +1,4 @@
-import { createForm, insert } from "@modular-forms/solid";
+import { createForm, insert, remove } from "@modular-forms/solid";
 import { useSearchParams } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
@@ -179,7 +179,7 @@ function Tickets() {
                                           value={field.value}
                                           error={field.error}
                                           type="text"
-                                          label="Commited At"
+                                          label="Commited at"
                                           required
                                         />
                                       </ModularControl>
@@ -198,7 +198,7 @@ function Tickets() {
                                           value={field.value}
                                           error={field.error}
                                           type="text"
-                                          label="Commit platform"
+                                          label="Platform"
                                           required
                                         />
                                       </ModularControl>
@@ -226,7 +226,7 @@ function Tickets() {
                                     name={`${commits.name}.${index()}.message`}
                                   >
                                     {(field, props) => (
-                                      <ModularControl class="col-span-2 sm:col-span-3">
+                                      <ModularControl class="col-span-2 sm:col-span-2">
                                         <ModularTextInput
                                           {...props}
                                           value={field.value}
@@ -237,6 +237,22 @@ function Tickets() {
                                       </ModularControl>
                                     )}
                                   </Field>
+
+                                  <div class="sm:col-span-1 flex items-end">
+                                    <div class="mb-2">
+                                      <Button
+                                        type="button"
+                                        variants="link"
+                                        onClick={() =>
+                                          remove(ticketsForm, commits.name, {
+                                            at: index(),
+                                          })
+                                        }
+                                      >
+                                        Delete
+                                      </Button>
+                                    </div>
+                                  </div>
                                 </div>
                               )}
                             </For>
