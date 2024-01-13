@@ -58,7 +58,7 @@ export const CardFooter = (props: JSX.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       class={twMerge(
-        "bg-gray-900 border-gray-700 border-b rounded-t-lg py-3 px-4",
+        "bg-gray-900 border-gray-700 border-t py-3 px-4",
         mainProps.class
       )}
       {...otherProps}

@@ -3,7 +3,7 @@ import { useSearchParams } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
-import { Card, CardContent } from "~/components/card";
+import { Card, CardContent, CardFooter } from "~/components/card";
 import {
   ModularControl,
   ModularTextInput,
@@ -130,7 +130,7 @@ function Tickets() {
                 <For each={tickets.items}>
                   {(_, index) => (
                     <>
-                      <div class="flex">
+                      <div class="flex items-end">
                         <Field name={`${tickets.name}.${index()}.name`}>
                           {(field, props) => (
                             <ModularControl class="flex-initial w-36">
@@ -159,6 +159,22 @@ function Tickets() {
                             </ModularControl>
                           )}
                         </Field>
+
+                        <div class="flex-initial w-36">
+                          <div class="mb-2">
+                            <Button
+                              type="button"
+                              variants="link"
+                              onClick={() =>
+                                remove(ticketsForm, tickets.name, {
+                                  at: index(),
+                                })
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
                       </div>
 
                       <FieldArray name={`${tickets.name}.${index()}.commits`}>
@@ -280,6 +296,22 @@ function Tickets() {
                     </>
                   )}
                 </For>
+                <CardFooter class="px-2 mt-4">
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      insert(ticketsForm, tickets.name, {
+                        value: {
+                          name: "",
+                          description: "",
+                          commits: [],
+                        },
+                      })
+                    }
+                  >
+                    Add ticket
+                  </Button>
+                </CardFooter>
               </Show>
             )}
           </FieldArray>
