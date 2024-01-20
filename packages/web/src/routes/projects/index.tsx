@@ -19,7 +19,6 @@ import { Link } from "~/components/link";
 import { ROUTES } from "~/App";
 import { listPlatforms } from "~/data/platform";
 import { useProject } from "~/providers/project";
-import { OutlineBadge } from "~/components/badge";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -162,7 +161,6 @@ function Platforms() {
                     class="justify-between"
                   >
                     <span>{platform.name}</span>
-                    <OutlineBadge>{platform.prefix_ticket}</OutlineBadge>
                   </ListGroupAnchorItem>
                 )}
               </For>
