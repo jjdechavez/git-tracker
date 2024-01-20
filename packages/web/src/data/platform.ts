@@ -11,7 +11,6 @@ export const platformSchema = z.object({
   name: z.string(),
   slug: z.string(),
   status: z.enum(["inactive", "active"]),
-  prefix_ticket: z.string().nullable(),
 });
 
 export const createPlatform = async (

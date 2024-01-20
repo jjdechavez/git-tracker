@@ -8,7 +8,6 @@ export interface PlatformTable {
   project_id: number;
   creator_id: number;
   status: PlatformStatus;
-  prefix_ticket: string | null
   created_at: ColumnType<Date, string | undefined, never>;
 }
 

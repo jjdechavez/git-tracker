@@ -13,7 +13,6 @@ export const Info = z.object({
   project_id: z.number(),
   creator_id: z.number(),
   status: z.nativeEnum(PlatformStatuses),
-  prefix_ticket: z.string().nullable(),
   created_at: z.date(),
 });
 
@@ -69,7 +68,6 @@ export const findBySlug = z
         "platform.name",
         "platform.slug",
         "platform.status",
-        "platform.prefix_ticket",
       ]);
 
     if (criteria.creator_id) {
@@ -103,7 +101,6 @@ export const list = z
         "platform.name",
         "platform.slug",
         "platform.status",
-        "platform.prefix_ticket",
       ]);
 
     if (criteria.slug) {
