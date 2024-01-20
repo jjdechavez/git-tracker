@@ -70,6 +70,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Get platform by slug",
         },
       },
+      "POST /tickets": {
+        function: {
+          handler: "packages/functions/src/ticket.create",
+          description: "Create ticket",
+        },
+      },
     },
   });
 
