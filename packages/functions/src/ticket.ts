@@ -1,7 +1,13 @@
 import { useJsonBody } from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Ticket } from "@git-tracker/core/ticket";
-import { BadRequestResponse, UnauthorizedResponse, withApiAuth } from "./api";
+import {
+  BadRequestResponse,
+  NotFoundResponse,
+  UnauthorizedResponse,
+  withApiAuth,
+} from "./api";
+import { Project } from "@git-tracker/core/project";
 
 export const create = withApiAuth(async () => {
   const body = useJsonBody();
@@ -11,14 +17,21 @@ export const create = withApiAuth(async () => {
   }
 
   const session = useSession();
+
   if (session.type !== "user") {
     throw new UnauthorizedResponse();
+  }
+
+  const project = await Project.findBySlug(body.projectSlug, {});
+
+  if (!project) {
+    throw new NotFoundResponse("Project not found by slug");
   }
 
   const validateSchema = Ticket.createSchema.safeParse({
     name: body.name,
     description: body.description,
-    project_id: body.projectId,
+    project_id: project.id,
     creator_id: Number(session.properties.userID),
   });
 
