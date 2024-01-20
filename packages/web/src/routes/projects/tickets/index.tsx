@@ -1,6 +1,12 @@
-import { createForm, insert, remove } from "@modular-forms/solid";
+import {
+  SubmitHandler,
+  createForm,
+  insert,
+  remove,
+  required,
+} from "@modular-forms/solid";
 import { useSearchParams } from "@solidjs/router";
-import { For, Show } from "solid-js";
+import { For, Match, Show, Switch, createEffect, createSignal } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
 import { Card, CardContent, CardFooter } from "~/components/card";
@@ -8,7 +14,8 @@ import {
   ModularControl,
   ModularTextInput,
 } from "~/components/form/modular/text-field";
-import { EmptyState } from "~/components/state";
+import { EmptyState, LoadingState } from "~/components/state";
+import { Bin, Check, ChevronDown, XMark } from "~/components/svg";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,7 +44,8 @@ export function ProjectTicketsRoute() {
       </Show>
 
       <div class="mt-8">
-        <Tickets />
+        {/* <Tickets /> */}
+        <Ticketsv2 />
       </div>
     </section>
   );
@@ -161,17 +169,28 @@ function Tickets() {
                         </Field>
 
                         <div class="flex-initial w-36">
-                          <div class="mb-2">
+                          <div class="flex align-middle gap-x-0.5 p-2">
                             <Button
                               type="button"
                               variants="link"
+                              size="icon"
                               onClick={() =>
                                 remove(ticketsForm, tickets.name, {
                                   at: index(),
                                 })
                               }
+                              title="Delete ticket"
                             >
-                              Delete
+                              <Bin />
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variants="link"
+                              size="icon"
+                              title="Hide commits"
+                            >
+                              <ChevronDown />
                             </Button>
                           </div>
                         </div>
@@ -318,5 +337,123 @@ function Tickets() {
         </Form>
       </CardContent>
     </Card>
+  );
+}
+
+function Ticketsv2() {
+  const [tickets, _setTickets] = createSignal([]);
+  const [createStatus, setCreateStatus] = createSignal<
+    "fetching" | "pending" | "starting" | "created"
+  >("fetching");
+
+  createEffect(() => console.log(createStatus()));
+
+  return (
+    <Card>
+      <CardContent>
+        <Switch>
+          <Match when={createStatus() === "fetching"}>
+            <LoadingState
+              message="Fetching tickets from the server"
+              class="md:p-7"
+            />
+          </Match>
+
+          <Match when={createStatus() === "pending"}>
+            <EmptyState message="No tickets to show" class="md:p-7">
+              <Button
+                type="button"
+                class="mt-4"
+                onClick={() => setCreateStatus(() => "starting")}
+              >
+                New ticket
+              </Button>
+            </EmptyState>
+          </Match>
+
+          <Match when={createStatus() === "starting"}>
+            <TicketForm />
+          </Match>
+
+          <Match when={createStatus() === "created"}>
+            {/* list tickets */}
+            display list
+          </Match>
+        </Switch>
+      </CardContent>
+    </Card>
+  );
+}
+
+type TicketForm2 = {
+  name: string;
+  description?: string;
+};
+
+function TicketForm() {
+  const [ticketsForm, { Form, Field }] = createForm<TicketForm2>({
+    initialValues: { name: "", description: undefined },
+  });
+
+  return (
+    <Form onSubmit={(values) => console.log("result form values: ", values)}>
+      <div class="flex items-end">
+        <Field
+          name="name"
+          validate={[required("Please enter your ticket name")]}
+        >
+          {(field, props) => (
+            <ModularControl class="flex-initial w-36">
+              <ModularTextInput
+                {...props}
+                value={field.value}
+                error={field.error}
+                type="text"
+                label="Ticket Name"
+                required
+              />
+            </ModularControl>
+          )}
+        </Field>
+
+        <Field name="description">
+          {(field, props) => (
+            <ModularControl class="flex-auto w-64">
+              <ModularTextInput
+                {...props}
+                value={field.value}
+                error={field.error}
+                type="text"
+                label="Description"
+              />
+            </ModularControl>
+          )}
+        </Field>
+
+        <div class="flex-initial w-36">
+          <div class="flex align-middle gap-x-0.5 p-2">
+            <Button
+              type="submit"
+              variants="link"
+              size="icon"
+              title="Save changes"
+              disabled={ticketsForm.submitting}
+            >
+              <Check />
+            </Button>
+
+            <Button
+              type="button"
+              variants="link"
+              size="icon"
+              title="Cancel"
+              disabled={ticketsForm.submitting}
+            >
+              <XMark />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Form>
   );
 }
