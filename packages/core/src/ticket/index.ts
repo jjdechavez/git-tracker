@@ -15,7 +15,7 @@ export const Info = z.object({
 
 export type Info = z.infer<typeof Info>;
 
-export const createSchema = Info.omit({ created_at: true });
+export const createSchema = Info.omit({ id: true, created_at: true });
 
 export const create = z
   .function()
@@ -30,7 +30,10 @@ export const create = z
 
 export const list = z
   .function()
-  .args(idSchema, z.object({ s: z.string().optional(), projectId: idSchema }))
+  .args(
+    idSchema,
+    z.object({ s: z.string().optional(), projectId: idSchema.optional() })
+  )
   .implement(async (creatorId, criteria) => {
     let query = db
       .selectFrom("ticket")
@@ -52,9 +55,12 @@ export const list = z
       });
     }
 
+    if (criteria.projectId) {
+      query = query.where("ticket.project_id", "=", criteria.projectId);
+    }
+
     const tickets = await query
       .where("ticket.creator_id", "=", creatorId)
-      .where("ticket.project_id", "=", criteria.projectId)
       .execute();
 
     return tickets;
