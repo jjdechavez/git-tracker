@@ -84,3 +84,27 @@ export function ModularControl(props: ModularControlProps) {
     </div>
   );
 }
+
+export function ModularEditableTextInput(props: {
+  label?: string;
+  value: string | undefined;
+}) {
+  const getValue = createMemo<string | number | undefined>(
+    (prevValue) =>
+      props.value === undefined
+        ? ""
+        : !Number.isNaN(props.value)
+        ? props.value
+        : prevValue,
+    ""
+  );
+
+  return (
+    <>
+      <Show when={props.label}>
+        <Label for={props.label}>{props.label}</Label>
+      </Show>
+      <div>{getValue()}</div>
+    </>
+  );
+}
