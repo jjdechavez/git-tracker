@@ -76,6 +76,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Create ticket",
         },
       },
+      "GET /tickets": {
+        function: {
+          handler: "packages/functions/src/ticket.list",
+          description: "List of tickets",
+        },
+      },
     },
   });
 
