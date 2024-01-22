@@ -20,13 +20,26 @@ type TextFieldProps = {
   onInput: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, InputEvent>;
   onChange: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, Event>;
   onBlur: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
+  onKeyDown?: JSX.EventHandler<
+    HTMLInputElement | HTMLTextAreaElement,
+    KeyboardEvent
+  >;
 };
 
 export function ModularTextInput(props: TextFieldProps) {
   const [rootProps, inputProps] = splitProps(
     props,
     ["name", "value", "required", "disabled"],
-    ["placeholder", "ref", "onInput", "onChange", "onBlur", "autofocus", "name"]
+    [
+      "placeholder",
+      "ref",
+      "onInput",
+      "onChange",
+      "onBlur",
+      "autofocus",
+      "name",
+      "onKeyDown",
+    ]
   );
 
   const getValue = createMemo<string | number | undefined>(

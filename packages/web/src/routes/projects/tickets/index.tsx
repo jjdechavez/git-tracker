@@ -1,9 +1,9 @@
 import {
-  SubmitHandler,
   createForm,
   insert,
   remove,
   required,
+  focus,
 } from "@modular-forms/solid";
 import { useParams, useSearchParams } from "@solidjs/router";
 import {
@@ -16,6 +16,8 @@ import {
   createEffect,
   createResource,
   createSignal,
+  onMount,
+  splitProps,
 } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
@@ -423,17 +425,9 @@ function Ticketsv2() {
                 <EditableRow
                   name={ticket.name}
                   description={ticket.description}
-                >
-                  <TicketForm
-                    action="edit"
-                    refetchTickets={refetch}
-                    setCreateStatus={setCreateStatus}
-                    fields={{
-                      name: ticket.name,
-                      description: ticket.description,
-                    }}
-                  />
-                </EditableRow>
+                  refetchTickets={refetch}
+                  setCreateStatus={setCreateStatus}
+                ></EditableRow>
               )}
             </For>
             <CardFooter class="px-2 mt-4">
@@ -447,7 +441,12 @@ function Ticketsv2() {
 }
 
 function EditableRow(
-  props: ParentProps & { name: string; description?: string }
+  props: ParentProps & {
+    name: string;
+    description?: string;
+    refetchTickets: () => void;
+    setCreateStatus: Setter<CreateStatus>;
+  }
 ) {
   const [edit, setEdit] = createSignal(false);
 
@@ -481,6 +480,17 @@ function EditableRow(
       }
     >
       {props.children}
+
+      <TicketForm
+        action="edit"
+        refetchTickets={props.refetchTickets}
+        setCreateStatus={props.setCreateStatus}
+        setEdit={setEdit}
+        fields={{
+          name: props.name,
+          description: props.description,
+        }}
+      />
     </Show>
   );
 }
@@ -489,6 +499,7 @@ type TicketFormv2 = Pick<NewTicket, "name" | "description">;
 type TicketBaseProps = {
   refetchTickets: () => void;
   setCreateStatus: Setter<CreateStatus>;
+  setEdit: Setter<boolean>;
 };
 type TicketCreateForm = TicketBaseProps & {
   action: "create";
@@ -501,11 +512,16 @@ type TicketFormProps = TicketCreateForm | TicketEditForm;
 
 function TicketForm(props: TicketFormProps) {
   const params = useParams();
+  const [actionProps] = splitProps(props, ["setEdit"]);
   const [ticketsForm, { Form, Field }] = createForm<TicketFormv2>({
     initialValues:
       props.action === "edit"
         ? { name: props.fields.name, description: props.fields.description }
         : { name: "", description: undefined },
+  });
+
+  onMount(() => {
+    focus(ticketsForm, "name");
   });
 
   return (
@@ -535,6 +551,11 @@ function TicketForm(props: TicketFormProps) {
                 type="text"
                 label="Ticket Name"
                 required
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    actionProps.setEdit((prev) => !prev);
+                  }
+                }}
               />
             </ModularControl>
           )}
@@ -549,6 +570,11 @@ function TicketForm(props: TicketFormProps) {
                 error={field.error}
                 type="text"
                 label="Description"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    actionProps.setEdit((prev) => !prev);
+                  }
+                }}
               />
             </ModularControl>
           )}
@@ -572,6 +598,7 @@ function TicketForm(props: TicketFormProps) {
               size="icon"
               title="Cancel"
               disabled={ticketsForm.submitting}
+              onClick={() => actionProps.setEdit(false)}
             >
               <XMark />
             </Button>
