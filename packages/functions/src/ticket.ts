@@ -1,4 +1,4 @@
-import { useJsonBody, useQueryParam } from "sst/node/api";
+import { useJsonBody, usePathParam, useQueryParam } from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Ticket } from "@git-tracker/core/ticket";
 import {
@@ -73,5 +73,48 @@ export const list = withApiAuth(async (_evt) => {
   return {
     statusCode: 200,
     body: JSON.stringify({ data: tickets }),
+  };
+});
+
+export const update = withApiAuth(async () => {
+  const session = useSession();
+
+  if (session.type !== "user") {
+    throw new UnauthorizedResponse();
+  }
+
+  const ticketId = usePathParam("ticketId");
+
+  if (!ticketId) {
+    throw new BadRequestResponse("Missing ticket ID");
+  }
+
+  const body = useJsonBody();
+
+  if (!body) {
+    throw new BadRequestResponse("Missing body");
+  }
+
+  const ticketExists = await Ticket.list(session.properties.userID, {
+    ticketIds: [ticketId],
+  });
+
+  if (ticketExists.length === 0) {
+    throw new NotFoundResponse("Ticket not found");
+  }
+
+  const validateSchema = Ticket.updateSchema.safeParse({
+    name: body.name,
+    description: body.description,
+  });
+
+  if (!validateSchema.success) {
+    throw new BadRequestResponse(validateSchema.error.message);
+  }
+
+  await Ticket.update(ticketId, validateSchema.data);
+
+  return {
+    statusCode: 204,
   };
 });

@@ -82,6 +82,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "List of tickets",
         },
       },
+      "PUT /tickets/{ticketId}": {
+        function: {
+          handler: "packages/functions/src/ticket.update",
+          description: "Update ticket by id",
+        },
+      },
     },
   });
 

@@ -32,7 +32,11 @@ export const list = z
   .function()
   .args(
     idSchema,
-    z.object({ s: z.string().optional(), projectId: idSchema.optional() })
+    z.object({
+      s: z.string().optional(),
+      projectId: idSchema.optional(),
+      ticketIds: z.array(idSchema).optional(),
+    })
   )
   .implement(async (creatorId, criteria) => {
     let query = db
@@ -59,9 +63,29 @@ export const list = z
       query = query.where("ticket.project_id", "=", criteria.projectId);
     }
 
+    if (criteria.ticketIds) {
+      query = query.where("ticket.id", "in", criteria.ticketIds);
+    }
+
     const tickets = await query
       .where("ticket.creator_id", "=", creatorId)
       .execute();
 
     return tickets;
+  });
+
+export const updateSchema = Info.pick({
+  name: true,
+  description: true,
+}).partial();
+
+export const update = z
+  .function()
+  .args(idSchema, updateSchema)
+  .implement(async (ticketId, updateWith) => {
+    await db
+      .updateTable("ticket")
+      .set(updateWith)
+      .where("id", "=", ticketId)
+      .execute();
   });
