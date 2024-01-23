@@ -9,13 +9,11 @@ import { useParams, useSearchParams } from "@solidjs/router";
 import {
   For,
   Match,
-  Setter,
   Show,
   Switch,
   createEffect,
   createResource,
   createSignal,
-  onMount,
 } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
@@ -27,7 +25,12 @@ import {
 } from "~/components/form/modular/text-field";
 import { EmptyState, LoadingState } from "~/components/state";
 import { Bin, Check, ChevronDown, XMark } from "~/components/svg";
-import { NewTicket, createTicket, listTickets } from "~/data/ticket";
+import {
+  NewTicket,
+  createTicket,
+  listTickets,
+  updateTicket,
+} from "~/data/ticket";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -393,7 +396,7 @@ function Ticketsv2() {
               tickets().length === 0
             }
           >
-            <TicketForm
+            <EditableTicket
               action="create"
               afterSubmit={() => {
                 refetch();
@@ -412,12 +415,29 @@ function Ticketsv2() {
               {(ticket) => (
                 <>
                   <EditableTicket
+                    action="edit"
                     ticketId={ticket.id}
-                    name={ticket.name}
-                    description={ticket.description}
-                    afterSubmit={() => {
-                      refetch();
-                      setCreateTicketStatus(() => "created");
+                    fields={{
+                      name: ticket.name,
+                      description: ticket.description,
+                    }}
+                    afterSubmit={(result) => {
+                      if (result.action === "edit") {
+                        mutate((prev) => {
+                          const currentTickets = prev || [];
+                          return currentTickets.map((ticket) => {
+                            if (ticket.id === result.ticketId) {
+                              return {
+                                ...ticket,
+                                name: result.values.name,
+                                description: result.values.description,
+                              };
+                            }
+                            return ticket;
+                          });
+                        });
+                        refetch();
+                      }
                     }}
                   />
                 </>
@@ -435,23 +455,25 @@ function Ticketsv2() {
                   </Button>
                 }
               >
-                <TicketForm
+                <EditableTicket
                   action="create"
-                  afterSubmit={(values) => {
-                    mutate((prev) => {
-                      const currentTickets = prev || [];
-                      return [
-                        ...currentTickets,
-                        {
-                          id: 0,
-                          project_id: 0,
-                          name: values.name,
-                          description: values.description,
-                        },
-                      ];
-                    });
-                    refetch();
-                    setCreateTicketStatus(() => "created");
+                  afterSubmit={(result) => {
+                    if (result.action === "create") {
+                      mutate((prev) => {
+                        const currentTickets = prev || [];
+                        return [
+                          ...currentTickets,
+                          {
+                            id: 0,
+                            project_id: 0,
+                            name: result.values.name,
+                            description: result.values.description,
+                          },
+                        ];
+                      });
+                      refetch();
+                      setCreateTicketStatus(() => "created");
+                    }
                   }}
                   cancelAction={() => {
                     setCreateTicketStatus(() => "idle");
@@ -466,11 +488,189 @@ function Ticketsv2() {
   );
 }
 
-function EditableTicket(props: {
+type TicketFormv2 = Pick<NewTicket, "name" | "description">;
+type AfterSubmitCreate = { action: "create"; values: TicketFormv2 };
+type AfterSubmitEdit = {
+  action: "edit";
+  values: TicketFormv2;
+  ticketId: number;
+};
+
+type EditableTicketBaseProps = {
+  afterSubmit: (values: AfterSubmitCreate | AfterSubmitEdit) => void;
+  cancelAction?: () => void;
+};
+type EditableCreateTicket = EditableTicketBaseProps & {
+  action: "create";
+};
+type EditableUpdateTicket = EditableTicketBaseProps & {
+  action: "edit";
+  fields: TicketFormv2;
+  ticketId: number;
+};
+type EditableTicketProps = EditableCreateTicket | EditableUpdateTicket;
+
+function EditableTicket(props: EditableTicketProps) {
+  const params = useParams();
+  const [ticketsForm, { Form, Field }] = createForm<TicketFormv2>({
+    initialValues:
+      props.action === "edit"
+        ? { name: props.fields.name, description: props.fields.description }
+        : { name: "", description: undefined },
+  });
+  const [edit, setEdit] = createSignal(false);
+
+  createEffect(() => {
+    if (props.action === "create") {
+      setEdit(true);
+    }
+    if (edit()) {
+      focus(ticketsForm, "name");
+    }
+  });
+
+  return (
+    <Show
+      when={edit()}
+      fallback={
+        <button
+          type="button"
+          onClick={() => {
+            setEdit((prevEdit) => !prevEdit);
+          }}
+          class="w-full hover:bg-gray-700/50"
+        >
+          <div class="w-auto flex items-end text-start">
+            <ModularControl class="flex-initial w-36">
+              <ModularEditableTextInput
+                label="Ticket Name"
+                value={props.action === "edit" ? props.fields.name : ""}
+              />
+            </ModularControl>
+
+            <ModularControl class="flex-auto w-64">
+              <ModularEditableTextInput
+                label="Description"
+                value={props.action === "edit" ? props.fields.description : ""}
+              />
+            </ModularControl>
+          </div>
+        </button>
+      }
+    >
+      <Form
+        onSubmit={async (values) => {
+          if (props.action === "create") {
+            await createTicket({
+              ...values,
+              projectSlug: params.projectSlug,
+            });
+            props.afterSubmit({
+              action: "create",
+              values,
+            });
+          } else if (props.action === "edit") {
+            await updateTicket(props.ticketId, values);
+            props.afterSubmit({
+              action: "edit",
+              values,
+              ticketId: props.ticketId,
+            });
+          }
+        }}
+      >
+        <div class="flex items-end">
+          <Field
+            name="name"
+            validate={[required("Please enter your ticket name")]}
+          >
+            {(field, fieldProps) => (
+              <ModularControl class="flex-initial w-36">
+                <ModularTextInput
+                  {...fieldProps}
+                  autofocus={fieldProps.autofocus}
+                  value={field.value}
+                  error={field.error}
+                  type="text"
+                  label="Ticket Name"
+                  required
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      if (props.action === "edit") {
+                        setEdit(false);
+                      }
+                      props.cancelAction?.();
+                    }
+                  }}
+                />
+              </ModularControl>
+            )}
+          </Field>
+
+          <Field name="description">
+            {(field, fieldProps) => (
+              <ModularControl class="flex-auto w-64">
+                <ModularTextInput
+                  {...fieldProps}
+                  value={field.value}
+                  error={field.error}
+                  type="text"
+                  label="Description"
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      if (props.action === "edit") {
+                        setEdit(false);
+                      }
+                      props.cancelAction?.();
+                    }
+                  }}
+                />
+              </ModularControl>
+            )}
+          </Field>
+
+          <div class="flex-initial w-36">
+            <div class="flex align-middle gap-x-0.5 p-2">
+              <Button
+                type="submit"
+                variants="link"
+                size="icon"
+                title="Save changes"
+                disabled={ticketsForm.submitting}
+              >
+                <Check />
+              </Button>
+
+              <Show when={props.action === "edit"}>
+                <Button
+                  type="button"
+                  variants="link"
+                  size="icon"
+                  title="Cancel"
+                  disabled={ticketsForm.submitting}
+                  onClick={() => {
+                    if (props.action === "edit") {
+                      setEdit(false);
+                    }
+
+                    props.cancelAction?.();
+                  }}
+                >
+                  <XMark />
+                </Button>
+              </Show>
+            </div>
+          </div>
+        </div>
+      </Form>
+    </Show>
+  );
+}
+
+function EditableCommit(props: {
   ticketId: number;
   name: string;
   description?: string;
-  afterSubmit: () => void;
 }) {
   const [edit, setEdit] = createSignal(false);
 
@@ -503,144 +703,100 @@ function EditableTicket(props: {
         </button>
       }
     >
-      <TicketForm
-        action="edit"
-        afterSubmit={() => props.afterSubmit()}
-        setEdit={setEdit}
-        ticketId={props.ticketId}
-        fields={{
-          name: props.name,
-          description: props.description,
-        }}
-      />
+      ok
     </Show>
   );
 }
 
-type TicketFormv2 = Pick<NewTicket, "name" | "description">;
-type TicketBaseProps = {
-  afterSubmit: (values: TicketFormv2) => void;
-  cancelAction?: () => void;
-};
-type TicketCreateForm = TicketBaseProps & {
-  action: "create";
-};
-type TicketEditForm = TicketBaseProps & {
-  action: "edit";
-  setEdit: Setter<boolean>;
-  fields: TicketFormv2;
-  ticketId: number;
-};
-type TicketFormProps = TicketCreateForm | TicketEditForm;
-
-function TicketForm(props: TicketFormProps) {
-  const params = useParams();
-  const [ticketsForm, { Form, Field }] = createForm<TicketFormv2>({
-    initialValues:
-      props.action === "edit"
-        ? { name: props.fields.name, description: props.fields.description }
-        : { name: "", description: undefined },
-  });
-
-  onMount(() => {
-    focus(ticketsForm, "name");
+function CommitForm() {
+  const [ticketsForm, { Form, Field }] = createForm<{
+    commitedAt: string;
+    platformId: string;
+    hashed: string;
+    message?: string;
+  }>({
+    initialValues: {
+      commitedAt: "",
+      platformId: "",
+      hashed: "",
+      message: undefined,
+    },
   });
 
   return (
-    <Form
-      onSubmit={async (value) => {
-        if (props.action === "create") {
-          await createTicket({
-            ...value,
-            projectSlug: params.projectSlug,
-          });
-        }
-        props.afterSubmit(value);
-      }}
-    >
-      <div class="flex items-end">
-        <Field
-          name="name"
-          validate={[required("Please enter your ticket name")]}
-        >
-          {(field, fieldProps) => (
-            <ModularControl class="flex-initial w-36">
+    <Form onSubmit={(values) => console.log(values)}>
+      <div class="grid gap-x-2 grid-cols-4 sm:grid-cols-6 divide divide-slate-800">
+        <Field name={`commitedAt`}>
+          {(field, props) => (
+            <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
-                {...fieldProps}
+                {...props}
                 value={field.value}
                 error={field.error}
                 type="text"
-                label="Ticket Name"
+                label="Commited at"
                 required
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    if (props.action === "edit") {
-                      props.setEdit((prev) => !prev);
-                    }
-                    props.cancelAction?.();
-                  }
-                }}
               />
             </ModularControl>
           )}
         </Field>
 
-        <Field name="description">
-          {(field, fieldProps) => (
-            <ModularControl class="flex-auto w-64">
+        <Field name={`platformId`}>
+          {(field, props) => (
+            <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
-                {...fieldProps}
+                {...props}
                 value={field.value}
                 error={field.error}
                 type="text"
-                label="Description"
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    if (props.action === "edit") {
-                      props.setEdit((prev) => !prev);
-                    }
-                    props.cancelAction?.();
-                  }
-                }}
+                label="Platform"
+                required
               />
             </ModularControl>
           )}
         </Field>
 
-        <div class="flex-initial w-36">
-          <div class="flex align-middle gap-x-0.5 p-2">
-            <Button
-              type="submit"
-              variants="link"
-              size="icon"
-              title="Save changes"
-              disabled={ticketsForm.submitting}
-            >
-              <Check />
+        <Field name={`hashed`}>
+          {(field, props) => (
+            <ModularControl class="col-span-2 sm:col-span-1">
+              <ModularTextInput
+                {...props}
+                value={field.value}
+                error={field.error}
+                type="text"
+                label="Hashed"
+                required
+              />
+            </ModularControl>
+          )}
+        </Field>
+
+        <Field name={`message`}>
+          {(field, props) => (
+            <ModularControl class="col-span-2 sm:col-span-2">
+              <ModularTextInput
+                {...props}
+                value={field.value}
+                error={field.error}
+                type="text"
+                label="Message"
+              />
+            </ModularControl>
+          )}
+        </Field>
+
+        <div class="sm:col-span-1 flex items-end">
+          <div class="mb-2">
+            <Button type="button" variants="link">
+              Delete
             </Button>
-
-            <Show when={props.action === "edit"}>
-              <Button
-                type="button"
-                variants="link"
-                size="icon"
-                title="Cancel"
-                disabled={ticketsForm.submitting}
-                onClick={() => {
-                  if (props.action === "edit") {
-                    props.setEdit(false);
-                  }
-
-                  props.cancelAction?.();
-                }}
-              >
-                <XMark />
-              </Button>
-            </Show>
           </div>
         </div>
+      </div>
+
+      <div class="p-2 flex flex-wrap gap-4">
+        <Button type="button">Add commit</Button>
       </div>
     </Form>
   );
 }
-

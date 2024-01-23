@@ -50,3 +50,10 @@ export const listTickets = async (search: Partial<SearchPlatforms>) => {
 
   return tickets.data;
 };
+
+export const updateTicket = async (
+  ticketId: number,
+  updateWith: Partial<Pick<NewTicket, "name" | "description">>
+) => {
+  await externalApi().url(`/tickets/${ticketId}`).put(updateWith).res();
+};
