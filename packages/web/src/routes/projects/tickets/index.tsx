@@ -352,51 +352,34 @@ function Tickets() {
   );
 }
 
-type CreateStatus = "idle" | "starting" | "created";
+type CreateTicketStatus = "idle" | "creating" | "created";
 
 function Ticketsv2() {
   const params = useParams();
-  const [tickets, { refetch }] = createResource(
+  const [tickets, { refetch, mutate }] = createResource(
     () => ({ projectSlug: params.projectSlug }),
     listTickets
   );
-  const [createStatus, setCreateStatus] = createSignal<CreateStatus>("idle");
-
-  createEffect(() => {
-    if (
-      createStatus() === "idle" &&
-      tickets.state === "ready" &&
-      tickets().length > 0
-    ) {
-      setCreateStatus(() => "created");
-    }
-  });
+  const [createTicketStatus, setCreateTicketStatus] =
+    createSignal<CreateTicketStatus>("idle");
 
   return (
     <Card>
       <CardContent>
         <Switch>
-          <Match
-            when={createStatus() === "idle" && tickets.state === "pending"}
-          >
+          <Match when={tickets.state === "pending"}>
             <LoadingState
               message="Fetching tickets from the server"
               class="md:p-7"
             />
           </Match>
 
-          <Match
-            when={
-              createStatus() === "idle" &&
-              tickets.state === "ready" &&
-              tickets().length === 0
-            }
-          >
+          <Match when={tickets.state === "ready" && tickets().length === 0}>
             <EmptyState message="No tickets to show" class="md:p-7">
               <Button
                 type="button"
                 class="mt-4"
-                onClick={() => setCreateStatus(() => "starting")}
+                onClick={() => setCreateTicketStatus(() => "creating")}
               >
                 New ticket
               </Button>
@@ -405,32 +388,73 @@ function Ticketsv2() {
 
           <Match
             when={
-              createStatus() === "starting" &&
+              createTicketStatus() === "creating" &&
               tickets.state === "ready" &&
               tickets().length === 0
             }
           >
             <TicketForm
               action="create"
-              refetchTickets={refetch}
-              setCreateStatus={setCreateStatus}
+              afterSubmit={() => {
+                refetch();
+                setCreateTicketStatus(() => "created");
+              }}
             />
           </Match>
 
-          <Match when={tickets.state === "ready" && tickets().length > 0}>
+          <Match
+            when={
+              ["ready", "refreshing"].includes(tickets.state) &&
+              tickets()!.length > 0
+            }
+          >
             <For each={tickets()}>
               {(ticket) => (
-                <EditableTicket
-                  ticketId={ticket.id}
-                  name={ticket.name}
-                  description={ticket.description}
-                  refetchTickets={refetch}
-                  setCreateStatus={setCreateStatus}
-                />
+                <>
+                  <EditableTicket
+                    ticketId={ticket.id}
+                    name={ticket.name}
+                    description={ticket.description}
+                    afterSubmit={() => {
+                      refetch();
+                      setCreateTicketStatus(() => "created");
+                    }}
+                  />
+                </>
               )}
             </For>
             <CardFooter class="px-2 mt-4">
-              <Button type="button">Add ticket</Button>
+              <Show
+                when={createTicketStatus() === "creating"}
+                fallback={
+                  <Button
+                    type="button"
+                    onClick={() => setCreateTicketStatus(() => "creating")}
+                  >
+                    Add ticket
+                  </Button>
+                }
+              >
+                <TicketForm
+                  action="create"
+                  afterSubmit={(values) => {
+                    mutate((prev) => {
+                      const currentTickets = prev || [];
+                      return [
+                        ...currentTickets,
+                        {
+                          id: 0,
+                          project_id: 0,
+                          name: values.name,
+                          description: values.description,
+                        },
+                      ];
+                    });
+                    refetch();
+                    setCreateTicketStatus(() => "created");
+                  }}
+                />
+              </Show>
             </CardFooter>
           </Match>
         </Switch>
@@ -443,8 +467,7 @@ function EditableTicket(props: {
   ticketId: number;
   name: string;
   description?: string;
-  refetchTickets: () => void;
-  setCreateStatus: Setter<CreateStatus>;
+  afterSubmit: () => void;
 }) {
   const [edit, setEdit] = createSignal(false);
 
@@ -479,8 +502,7 @@ function EditableTicket(props: {
     >
       <TicketForm
         action="edit"
-        refetchTickets={props.refetchTickets}
-        setCreateStatus={props.setCreateStatus}
+        afterSubmit={() => props.afterSubmit()}
         setEdit={setEdit}
         ticketId={props.ticketId}
         fields={{
@@ -494,8 +516,7 @@ function EditableTicket(props: {
 
 type TicketFormv2 = Pick<NewTicket, "name" | "description">;
 type TicketBaseProps = {
-  refetchTickets: () => void;
-  setCreateStatus: Setter<CreateStatus>;
+  afterSubmit: (values: TicketFormv2) => void;
 };
 type TicketCreateForm = TicketBaseProps & {
   action: "create";
@@ -530,8 +551,7 @@ function TicketForm(props: TicketFormProps) {
             projectSlug: params.projectSlug,
           });
         }
-        props.refetchTickets();
-        props.setCreateStatus(() => "created");
+        props.afterSubmit(value);
       }}
     >
       <div class="flex items-end">
@@ -611,3 +631,4 @@ function TicketForm(props: TicketFormProps) {
     </Form>
   );
 }
+
