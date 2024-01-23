@@ -9,7 +9,6 @@ import { useParams, useSearchParams } from "@solidjs/router";
 import {
   For,
   Match,
-  ParentProps,
   Setter,
   Show,
   Switch,
@@ -17,7 +16,6 @@ import {
   createResource,
   createSignal,
   onMount,
-  splitProps,
 } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
@@ -422,12 +420,13 @@ function Ticketsv2() {
           <Match when={tickets.state === "ready" && tickets().length > 0}>
             <For each={tickets()}>
               {(ticket) => (
-                <EditableRow
+                <EditableTicket
+                  ticketId={ticket.id}
                   name={ticket.name}
                   description={ticket.description}
                   refetchTickets={refetch}
                   setCreateStatus={setCreateStatus}
-                ></EditableRow>
+                />
               )}
             </For>
             <CardFooter class="px-2 mt-4">
@@ -440,14 +439,13 @@ function Ticketsv2() {
   );
 }
 
-function EditableRow(
-  props: ParentProps & {
-    name: string;
-    description?: string;
-    refetchTickets: () => void;
-    setCreateStatus: Setter<CreateStatus>;
-  }
-) {
+function EditableTicket(props: {
+  ticketId: number;
+  name: string;
+  description?: string;
+  refetchTickets: () => void;
+  setCreateStatus: Setter<CreateStatus>;
+}) {
   const [edit, setEdit] = createSignal(false);
 
   return (
@@ -459,7 +457,7 @@ function EditableRow(
           onClick={() => {
             setEdit((prevEdit) => !prevEdit);
           }}
-          class="w-full"
+          class="w-full hover:bg-gray-700/50"
         >
           <div class="w-auto flex items-end text-start">
             <ModularControl class="flex-initial w-36">
@@ -479,13 +477,12 @@ function EditableRow(
         </button>
       }
     >
-      {props.children}
-
       <TicketForm
         action="edit"
         refetchTickets={props.refetchTickets}
         setCreateStatus={props.setCreateStatus}
         setEdit={setEdit}
+        ticketId={props.ticketId}
         fields={{
           name: props.name,
           description: props.description,
@@ -499,20 +496,20 @@ type TicketFormv2 = Pick<NewTicket, "name" | "description">;
 type TicketBaseProps = {
   refetchTickets: () => void;
   setCreateStatus: Setter<CreateStatus>;
-  setEdit: Setter<boolean>;
 };
 type TicketCreateForm = TicketBaseProps & {
   action: "create";
 };
 type TicketEditForm = TicketBaseProps & {
   action: "edit";
+  setEdit: Setter<boolean>;
   fields: TicketFormv2;
+  ticketId: number;
 };
 type TicketFormProps = TicketCreateForm | TicketEditForm;
 
 function TicketForm(props: TicketFormProps) {
   const params = useParams();
-  const [actionProps] = splitProps(props, ["setEdit"]);
   const [ticketsForm, { Form, Field }] = createForm<TicketFormv2>({
     initialValues:
       props.action === "edit"
@@ -542,18 +539,18 @@ function TicketForm(props: TicketFormProps) {
           name="name"
           validate={[required("Please enter your ticket name")]}
         >
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="flex-initial w-36">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Ticket Name"
                 required
                 onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    actionProps.setEdit((prev) => !prev);
+                  if (event.key === "Escape" && props.action === "edit") {
+                    props.setEdit((prev) => !prev);
                   }
                 }}
               />
@@ -562,17 +559,17 @@ function TicketForm(props: TicketFormProps) {
         </Field>
 
         <Field name="description">
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="flex-auto w-64">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Description"
                 onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    actionProps.setEdit((prev) => !prev);
+                  if (event.key === "Escape" && props.action === "edit") {
+                    props.setEdit((prev) => !prev);
                   }
                 }}
               />
@@ -592,16 +589,22 @@ function TicketForm(props: TicketFormProps) {
               <Check />
             </Button>
 
-            <Button
-              type="button"
-              variants="link"
-              size="icon"
-              title="Cancel"
-              disabled={ticketsForm.submitting}
-              onClick={() => actionProps.setEdit(false)}
-            >
-              <XMark />
-            </Button>
+            <Show when={props.action === "edit"}>
+              <Button
+                type="button"
+                variants="link"
+                size="icon"
+                title="Cancel"
+                disabled={ticketsForm.submitting}
+                onClick={() =>
+                  props.action === "edit"
+                    ? props.setEdit(false)
+                    : console.log("cancel")
+                }
+              >
+                <XMark />
+              </Button>
+            </Show>
           </div>
         </div>
       </div>
