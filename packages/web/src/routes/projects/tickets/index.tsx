@@ -453,6 +453,9 @@ function Ticketsv2() {
                     refetch();
                     setCreateTicketStatus(() => "created");
                   }}
+                  cancelAction={() => {
+                    setCreateTicketStatus(() => "idle");
+                  }}
                 />
               </Show>
             </CardFooter>
@@ -517,6 +520,7 @@ function EditableTicket(props: {
 type TicketFormv2 = Pick<NewTicket, "name" | "description">;
 type TicketBaseProps = {
   afterSubmit: (values: TicketFormv2) => void;
+  cancelAction?: () => void;
 };
 type TicketCreateForm = TicketBaseProps & {
   action: "create";
@@ -569,8 +573,11 @@ function TicketForm(props: TicketFormProps) {
                 label="Ticket Name"
                 required
                 onKeyDown={(event) => {
-                  if (event.key === "Escape" && props.action === "edit") {
-                    props.setEdit((prev) => !prev);
+                  if (event.key === "Escape") {
+                    if (props.action === "edit") {
+                      props.setEdit((prev) => !prev);
+                    }
+                    props.cancelAction?.();
                   }
                 }}
               />
@@ -588,8 +595,11 @@ function TicketForm(props: TicketFormProps) {
                 type="text"
                 label="Description"
                 onKeyDown={(event) => {
-                  if (event.key === "Escape" && props.action === "edit") {
-                    props.setEdit((prev) => !prev);
+                  if (event.key === "Escape") {
+                    if (props.action === "edit") {
+                      props.setEdit((prev) => !prev);
+                    }
+                    props.cancelAction?.();
                   }
                 }}
               />
@@ -616,11 +626,13 @@ function TicketForm(props: TicketFormProps) {
                 size="icon"
                 title="Cancel"
                 disabled={ticketsForm.submitting}
-                onClick={() =>
-                  props.action === "edit"
-                    ? props.setEdit(false)
-                    : console.log("cancel")
-                }
+                onClick={() => {
+                  if (props.action === "edit") {
+                    props.setEdit(false);
+                  }
+
+                  props.cancelAction?.();
+                }}
               >
                 <XMark />
               </Button>
