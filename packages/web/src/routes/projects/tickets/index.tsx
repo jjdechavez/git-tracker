@@ -32,7 +32,8 @@ import {
   listTickets,
   updateTicket,
 } from "~/data/ticket";
-import { NewCommit } from "~/data/commit";
+import { NewCommit, createCommit } from "~/data/commit";
+import { ModularSelect } from "~/components/form/modular/select";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -442,7 +443,10 @@ function Ticketsv2() {
                       }
                     }}
                   />
-                  <AddCommit ticketId={ticket.id} />
+                  <AddCommit
+                    ticketId={ticket.id}
+                    afterCreate={() => refetch()}
+                  />
                 </>
               )}
             </For>
@@ -670,7 +674,7 @@ function EditableTicket(props: EditableTicketProps) {
   );
 }
 
-function AddCommit(props: { ticketId: number }) {
+function AddCommit(props: { ticketId: number; afterCreate: () => void }) {
   const [createCommitStatus, setCreateCommitStatus] =
     createSignal<CreateTicketStatus>("idle");
 
@@ -691,6 +695,10 @@ function AddCommit(props: { ticketId: number }) {
       <Match when={createCommitStatus() === "creating"}>
         <CommitForm
           ticketId={props.ticketId}
+          afterSubmit={() => {
+            setCreateCommitStatus(() => "created");
+            props.afterCreate();
+          }}
           cancelAction={() => {
             setCreateCommitStatus(() => "idle");
           }}
@@ -751,7 +759,11 @@ function EditableCommit(props: {
   );
 }
 
-function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
+function CommitForm(props: {
+  ticketId: number;
+  afterSubmit: (values: NewCommit) => void;
+  cancelAction?: () => void;
+}) {
   const [commitForm, { Form, Field }] = createForm<NewCommit>({
     initialValues: {
       commitedAt: "",
@@ -766,9 +778,14 @@ function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
   });
 
   return (
-    <Form onSubmit={(values) => console.log(values)}>
+    <Form
+      onSubmit={async (values) => {
+        await createCommit(props.ticketId, values);
+        props.afterSubmit(values);
+      }}
+    >
       <div class="grid gap-x-2 grid-cols-4 sm:grid-cols-6 divide divide-slate-800">
-        <Field name={`commitedAt`}>
+        <Field name="commitedAt">
           {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
@@ -788,27 +805,27 @@ function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
           )}
         </Field>
 
-        <Field name={`platformId`}>
+        <Field name="platformId">
           {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
-              <ModularTextInput
+              <ModularSelect
                 {...fieldProps}
+                label="Platform"
+                placeholder="Select a platform"
+                options={[
+                  { label: "SFM", value: "1" },
+                  { label: "Shoretrade", value: "2" },
+                  { label: "White Prince", value: "3" },
+                ]}
                 value={field.value}
                 error={field.error}
-                type="text"
-                label="Platform"
                 required
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    props.cancelAction?.();
-                  }
-                }}
               />
             </ModularControl>
           )}
         </Field>
 
-        <Field name={`hashed`}>
+        <Field name="hashed">
           {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
@@ -823,12 +840,13 @@ function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
                     props.cancelAction?.();
                   }
                 }}
+                maxlength={6}
               />
             </ModularControl>
           )}
         </Field>
 
-        <Field name={`message`}>
+        <Field name="message">
           {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-2">
               <ModularTextInput
@@ -849,6 +867,16 @@ function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
 
         <div class="sm:col-span-1 flex items-end">
           <div class="mb-2">
+            <Button
+              type="submit"
+              variants="link"
+              size="icon"
+              title="Save changes"
+              disabled={commitForm.submitting}
+            >
+              <Check />
+            </Button>
+
             <Button
               type="button"
               variants="link"

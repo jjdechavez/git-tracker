@@ -1,12 +1,11 @@
 import { JSX, Show, createMemo, splitProps } from "solid-js";
 import { twJoin } from "tailwind-merge";
 import { Label } from "../label";
-import { Input } from "../input";
+import { Input, type InputProps } from "../input";
 import { Info } from "../info";
 
-type TextFieldProps = {
+interface TextFieldProps extends InputProps {
   name: string;
-  type?: "text" | "email" | "tel" | "password" | "url" | "date" | "datetime-local" | undefined;
   label?: string | undefined;
   placeholder?: string | undefined;
   info?: string | undefined;
@@ -16,30 +15,12 @@ type TextFieldProps = {
   required?: boolean | undefined;
   disabled?: boolean | undefined;
   autofocus?: boolean | undefined;
-  ref: (element: HTMLInputElement | HTMLTextAreaElement) => void;
-  onInput: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, InputEvent>;
-  onChange: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, Event>;
-  onBlur: JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
-  onKeyDown?: JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    KeyboardEvent
-  >;
-};
+}
 
 export function ModularTextInput(props: TextFieldProps) {
   const [rootProps, inputProps] = splitProps(
     props,
     ["name", "value", "required", "disabled"],
-    [
-      "placeholder",
-      "ref",
-      "onInput",
-      "onChange",
-      "onBlur",
-      "autofocus",
-      "name",
-      "onKeyDown",
-    ]
   );
 
   const getValue = createMemo<string | number | undefined>(
