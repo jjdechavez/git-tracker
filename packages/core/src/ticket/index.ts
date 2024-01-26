@@ -50,10 +50,12 @@ export const list = z
         jsonArrayFrom(
           eb
             .selectFrom("commit")
+            .innerJoin("platform", "platform.id", "commit.platform_id")
             .select([
               "commit.id",
               "commit.commited_at",
               "commit.platform_id",
+              "platform.name as platform_name",
               "commit.hashed",
               "commit.message",
             ])
