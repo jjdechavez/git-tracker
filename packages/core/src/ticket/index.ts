@@ -1,4 +1,5 @@
 export * as Ticket from "./";
+import { jsonArrayFrom } from "kysely/helpers/sqlite";
 
 import { z } from "zod";
 import { db } from "../kysely";
@@ -41,11 +42,23 @@ export const list = z
   .implement(async (creatorId, criteria) => {
     let query = db
       .selectFrom("ticket")
-      .select([
+      .select((eb) => [
         "ticket.id",
         "ticket.name",
         "ticket.description",
         "ticket.project_id",
+        jsonArrayFrom(
+          eb
+            .selectFrom("commit")
+            .select([
+              "commit.id",
+              "commit.commited_at",
+              "commit.platform_id",
+              "commit.hashed",
+              "commit.message",
+            ])
+            .whereRef("commit.ticket_id", "=", "ticket_id")
+        ).as("commits"),
       ]);
 
     if (criteria.s) {
@@ -88,4 +101,23 @@ export const update = z
       .set(updateWith)
       .where("id", "=", ticketId)
       .execute();
+  });
+
+export const findById = z
+  .function()
+  .args(idSchema, z.object({ creatorId: idSchema }))
+  .implement(async (ticketId, criteria) => {
+    const ticket = await db
+      .selectFrom("ticket")
+      .select([
+        "ticket.id",
+        "ticket.name",
+        "ticket.description",
+        "ticket.project_id",
+      ])
+      .where("ticket.id", "=", ticketId)
+      .where("ticket.creator_id", "=", criteria.creatorId)
+      .executeTakeFirst();
+
+    return ticket;
   });

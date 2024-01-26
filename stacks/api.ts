@@ -88,6 +88,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Update ticket by id",
         },
       },
+      "POST /commits": {
+        function: {
+          handler: "packages/functions/src/commit.create",
+          description: "Create commit",
+        },
+      },
     },
   });
 
