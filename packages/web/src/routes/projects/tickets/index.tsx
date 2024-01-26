@@ -14,6 +14,7 @@ import {
   createEffect,
   createResource,
   createSignal,
+  onMount,
 } from "solid-js";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
@@ -440,6 +441,7 @@ function Ticketsv2() {
                       }
                     }}
                   />
+                  <AddCommit ticketId={ticket.id} />
                 </>
               )}
             </For>
@@ -667,10 +669,42 @@ function EditableTicket(props: EditableTicketProps) {
   );
 }
 
+function AddCommit(props: { ticketId: number }) {
+  const [createCommitStatus, setCreateCommitStatus] =
+    createSignal<CreateTicketStatus>("idle");
+
+  return (
+    <Switch>
+      <Match when={["idle", "created"].includes(createCommitStatus())}>
+        <div class="p-2 flex flex-wrap gap-4">
+          <Button
+            type="button"
+            variants="secondary"
+            onClick={() => setCreateCommitStatus(() => "creating")}
+          >
+            Add commit
+          </Button>
+        </div>
+      </Match>
+
+      <Match when={createCommitStatus() === "creating"}>
+        <CommitForm
+          ticketId={props.ticketId}
+          cancelAction={() => {
+            setCreateCommitStatus(() => "idle");
+          }}
+        />
+      </Match>
+    </Switch>
+  );
+}
+
 function EditableCommit(props: {
   ticketId: number;
-  name: string;
-  description?: string;
+  commitedAt: string;
+  platformId: string;
+  hashed: string;
+  message?: string;
 }) {
   const [edit, setEdit] = createSignal(false);
 
@@ -685,19 +719,27 @@ function EditableCommit(props: {
           }}
           class="w-full hover:bg-gray-700/50"
         >
-          <div class="w-auto flex items-end text-start">
-            <ModularControl class="flex-initial w-36">
+          <div class="grid gap-x-2 grid-cols-4 sm:grid-cols-6 divide divide-slate-800">
+            <ModularControl class="col-span-2 sm:col-span-1">
               <ModularEditableTextInput
-                label="Ticket Name"
-                value={props.name}
+                label="Commited At"
+                value={props.commitedAt}
               />
             </ModularControl>
 
-            <ModularControl class="flex-auto w-64">
+            <ModularControl class="col-span-2 sm:col-span-1">
               <ModularEditableTextInput
-                label="Description"
-                value={props.description}
+                label="Platform"
+                value={props.platformId}
               />
+            </ModularControl>
+
+            <ModularControl class="col-span-2 sm:col-span-1">
+              <ModularEditableTextInput label="Hashed" value={props.hashed} />
+            </ModularControl>
+
+            <ModularControl class="col-span-2 sm:col-span-2">
+              <ModularEditableTextInput label="Message" value={props.message} />
             </ModularControl>
           </div>
         </button>
@@ -708,8 +750,8 @@ function EditableCommit(props: {
   );
 }
 
-function CommitForm() {
-  const [ticketsForm, { Form, Field }] = createForm<{
+function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
+  const [commitForm, { Form, Field }] = createForm<{
     commitedAt: string;
     platformId: string;
     hashed: string;
@@ -723,63 +765,87 @@ function CommitForm() {
     },
   });
 
+  onMount(() => {
+    focus(commitForm, "commitedAt");
+  });
+
   return (
     <Form onSubmit={(values) => console.log(values)}>
       <div class="grid gap-x-2 grid-cols-4 sm:grid-cols-6 divide divide-slate-800">
         <Field name={`commitedAt`}>
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Commited at"
                 required
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    props.cancelAction?.();
+                  }
+                }}
               />
             </ModularControl>
           )}
         </Field>
 
         <Field name={`platformId`}>
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Platform"
                 required
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    props.cancelAction?.();
+                  }
+                }}
               />
             </ModularControl>
           )}
         </Field>
 
         <Field name={`hashed`}>
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-1">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Hashed"
                 required
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    props.cancelAction?.();
+                  }
+                }}
               />
             </ModularControl>
           )}
         </Field>
 
         <Field name={`message`}>
-          {(field, props) => (
+          {(field, fieldProps) => (
             <ModularControl class="col-span-2 sm:col-span-2">
               <ModularTextInput
-                {...props}
+                {...fieldProps}
                 value={field.value}
                 error={field.error}
                 type="text"
                 label="Message"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    props.cancelAction?.();
+                  }
+                }}
               />
             </ModularControl>
           )}
@@ -787,15 +853,20 @@ function CommitForm() {
 
         <div class="sm:col-span-1 flex items-end">
           <div class="mb-2">
-            <Button type="button" variants="link">
-              Delete
+            <Button
+              type="button"
+              variants="link"
+              size="icon"
+              title="Cancel"
+              disabled={commitForm.submitting}
+              onClick={() => {
+                props.cancelAction?.();
+              }}
+            >
+              <XMark />
             </Button>
           </div>
         </div>
-      </div>
-
-      <div class="p-2 flex flex-wrap gap-4">
-        <Button type="button">Add commit</Button>
       </div>
     </Form>
   );
