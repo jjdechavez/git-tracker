@@ -1,4 +1,4 @@
-import { Kysely, SqliteDialect } from "kysely";
+import { Kysely, SqliteDialect, ParseJSONResultsPlugin } from "kysely";
 import SQLite from "better-sqlite3";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { server } from "../util/server.env";
@@ -7,12 +7,14 @@ import { UserTable } from "../user/user.sql";
 import { ProjectTable } from "../project/project.sql";
 import { PlatformTable } from "../platform/platform.sql";
 import { TicketTable } from "../ticket/ticket.sql";
+import { CommitTable } from "../commit/commit.sql";
 
 interface Database {
   user: UserTable;
   project: ProjectTable;
   platform: PlatformTable;
   ticket: TicketTable;
+  commit: CommitTable;
 }
 
 const dialect = server.devMode
@@ -26,4 +28,5 @@ const dialect = server.devMode
 
 export const db = new Kysely<Database>({
   dialect,
+  plugins: [new ParseJSONResultsPlugin()],
 });
