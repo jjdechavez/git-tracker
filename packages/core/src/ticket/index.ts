@@ -57,7 +57,7 @@ export const list = z
               "commit.hashed",
               "commit.message",
             ])
-            .whereRef("commit.ticket_id", "=", "ticket_id")
+            .whereRef("commit.ticket_id", "=", "ticket.id")
         ).as("commits"),
       ]);
 
