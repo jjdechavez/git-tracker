@@ -6,7 +6,7 @@ import { Info } from "../info";
 
 type TextFieldProps = {
   name: string;
-  type?: "text" | "email" | "tel" | "password" | "url" | "date" | undefined;
+  type?: "text" | "email" | "tel" | "password" | "url" | "date" | "datetime-local" | undefined;
   label?: string | undefined;
   placeholder?: string | undefined;
   info?: string | undefined;

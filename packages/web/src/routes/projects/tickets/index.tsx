@@ -32,6 +32,7 @@ import {
   listTickets,
   updateTicket,
 } from "~/data/ticket";
+import { NewCommit } from "~/data/commit";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -751,12 +752,7 @@ function EditableCommit(props: {
 }
 
 function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
-  const [commitForm, { Form, Field }] = createForm<{
-    commitedAt: string;
-    platformId: string;
-    hashed: string;
-    message?: string;
-  }>({
+  const [commitForm, { Form, Field }] = createForm<NewCommit>({
     initialValues: {
       commitedAt: "",
       platformId: "",
@@ -779,7 +775,7 @@ function CommitForm(props: { ticketId: number; cancelAction?: () => void }) {
                 {...fieldProps}
                 value={field.value}
                 error={field.error}
-                type="text"
+                type="datetime-local"
                 label="Commited at"
                 required
                 onKeyDown={(event) => {
