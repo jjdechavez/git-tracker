@@ -18,10 +18,12 @@ interface TextFieldProps extends InputProps {
 }
 
 export function ModularTextInput(props: TextFieldProps) {
-  const [rootProps, inputProps] = splitProps(
-    props,
-    ["name", "value", "required", "disabled"],
-  );
+  const [rootProps, inputProps] = splitProps(props, [
+    "name",
+    "value",
+    "required",
+    "disabled",
+  ]);
 
   const getValue = createMemo<string | number | undefined>(
     (prevValue) =>
@@ -82,6 +84,7 @@ export function ModularControl(props: ModularControlProps) {
 export function ModularEditableTextInput(props: {
   label?: string;
   value: string | undefined;
+  class?: string;
 }) {
   const getValue = createMemo<string | number | undefined>(
     (prevValue) =>
@@ -98,7 +101,7 @@ export function ModularEditableTextInput(props: {
       <Show when={props.label}>
         <Label for={props.label}>{props.label}</Label>
       </Show>
-      <div>{getValue()}</div>
+      <div class={twJoin(props.class)}>{getValue()}</div>
     </>
   );
 }

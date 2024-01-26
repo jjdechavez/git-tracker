@@ -33,6 +33,16 @@ export const listTickets = async (search: Partial<SearchPlatforms>) => {
         name: z.string(),
         project_id: z.number(),
         description: z.string().optional(),
+        commits: z.array(
+          z.object({
+            id: z.number(),
+            commited_at: z.string(),
+            platform_id: z.number(),
+            platform_name: z.string(),
+            hashed: z.string(),
+            message: z.string().optional(),
+          })
+        ),
       })
     ),
   });
