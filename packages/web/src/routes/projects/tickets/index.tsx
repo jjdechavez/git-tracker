@@ -157,6 +157,15 @@ function Tickets(props: { searchTicket: string }) {
           </Match>
 
           <Match
+            when={tickets.state === "refreshing" && tickets().length === 0}
+          >
+            <LoadingState
+              message="Refetching tickets from the server"
+              class="md:p-7"
+            />
+          </Match>
+
+          <Match
             when={
               ["ready", "refreshing"].includes(tickets.state) &&
               tickets()!.length > 0
