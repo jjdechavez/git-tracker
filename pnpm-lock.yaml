@@ -79,6 +79,9 @@ importers:
       '@modular-forms/solid':
         specifier: ^0.20.0
         version: 0.20.0(solid-js@1.8.7)
+      '@solid-primitives/scheduled':
+        specifier: ^1.4.2
+        version: 1.4.2(solid-js@1.8.7)
       '@solid-primitives/storage':
         specifier: ^2.1.1
         version: 2.1.1(solid-js@1.8.7)
@@ -3241,7 +3244,7 @@ packages:
       '@solid-primitives/keyboard': 1.2.5(solid-js@1.8.7)
       '@solid-primitives/platform': 0.1.0(solid-js@1.8.7)
       '@solid-primitives/rootless': 1.4.2(solid-js@1.8.7)
-      '@solid-primitives/scheduled': 1.4.1(solid-js@1.8.7)
+      '@solid-primitives/scheduled': 1.4.2(solid-js@1.8.7)
       '@solid-primitives/static-store': 0.0.5(solid-js@1.8.7)
       '@solid-primitives/utils': 6.2.1(solid-js@1.8.7)
       solid-js: 1.8.7
@@ -3257,7 +3260,7 @@ packages:
       '@solid-primitives/media': 2.2.5(solid-js@1.8.7)
       '@solid-primitives/refs': 1.0.5(solid-js@1.8.7)
       '@solid-primitives/rootless': 1.4.2(solid-js@1.8.7)
-      '@solid-primitives/scheduled': 1.4.1(solid-js@1.8.7)
+      '@solid-primitives/scheduled': 1.4.2(solid-js@1.8.7)
       '@solid-primitives/static-store': 0.0.5(solid-js@1.8.7)
       '@solid-primitives/styles': 0.0.111(solid-js@1.8.7)
       '@solid-primitives/utils': 6.2.1(solid-js@1.8.7)
@@ -3364,13 +3367,12 @@ packages:
       solid-js: 1.8.7
     dev: true
 
-  /@solid-primitives/scheduled@1.4.1(solid-js@1.8.7):
-    resolution: {integrity: sha512-OLcNXwYpX7HUOEqNPcmR31dkyI1E2imkMDBRlqsGT0ZhJV1L2g0TEREpo4nm/kUhh8LVQzkfnxS+GONx9kh90A==}
+  /@solid-primitives/scheduled@1.4.2(solid-js@1.8.7):
+    resolution: {integrity: sha512-duKaugDQtPk0v6MnkBuEalWk66/vA2G7zzoimQEvmUdh2+K2o8t908HIfI2NdBfwakQMQBV4epE3TFeN2Vsveg==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
       solid-js: 1.8.7
-    dev: true
 
   /@solid-primitives/static-store@0.0.5(solid-js@1.8.7):
     resolution: {integrity: sha512-ssQ+s/wrlFAEE4Zw8GV499yBfvWx7SMm+ZVc11wvao4T5xg9VfXCL9Oa+x4h+vPMvSV/Knv5LrsLiUa+wlJUXQ==}

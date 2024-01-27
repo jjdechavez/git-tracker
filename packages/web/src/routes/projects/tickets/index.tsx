@@ -10,6 +10,7 @@ import {
   createSignal,
   onMount,
 } from "solid-js";
+import { debounce } from "@solid-primitives/scheduled";
 import { CloseButtonBadge, OutlineBadge } from "~/components/badge";
 import { Button } from "~/components/button";
 import { Card, CardContent, CardFooter } from "~/components/card";
@@ -35,6 +36,10 @@ import { Label } from "~/components/form/label";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTicket, setSearchTicket] = createSignal("");
+  const handleSearchTickets = debounce((search: string) => {
+    setSearchTicket(search);
+  }, 500);
 
   return (
     <section class="container p-5">
@@ -49,8 +54,15 @@ export function ProjectTicketsRoute() {
 
       <div class="flex items-center justify-start gap-x-2">
         <div class="flex gap-x-2 w-auto">
-          <Label for="search" class="mt-1">Search:</Label>
-          <Input type="text" name="search" />
+          <Label for="search" class="mt-1">
+            Search:
+          </Label>
+          <Input
+            type="text"
+            name="search"
+            value={searchTicket()}
+            onInput={(e) => handleSearchTickets(e.target.value)}
+          />
         </div>
         <Show when={searchParams.platform}>
           <p>
@@ -66,7 +78,7 @@ export function ProjectTicketsRoute() {
       </div>
 
       <div class="mt-8">
-        <Tickets />
+        <Tickets searchTicket={searchTicket()} />
       </div>
     </section>
   );
@@ -74,14 +86,18 @@ export function ProjectTicketsRoute() {
 
 type CreateTicketStatus = "idle" | "creating" | "created";
 
-function Tickets() {
+function Tickets(props: { searchTicket: string }) {
   const params = useParams();
   const [tickets, { refetch, mutate }] = createResource(
-    () => ({ projectSlug: params.projectSlug }),
+    () =>
+      props.searchTicket.length > 0
+        ? { projectSlug: params.projectSlug, s: props.searchTicket }
+        : { projectSlug: params.projectSlug },
     listTickets
   );
   const [createTicketStatus, setCreateTicketStatus] =
     createSignal<CreateTicketStatus>("idle");
+  refetch({});
 
   return (
     <Card>

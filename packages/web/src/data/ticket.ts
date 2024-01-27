@@ -23,6 +23,7 @@ export const createTicket = async (newTicket: NewTicket) => {
 
 export type SearchPlatforms = {
   projectSlug: string;
+  s: string;
 };
 
 export const listTickets = async (search: Partial<SearchPlatforms>) => {
