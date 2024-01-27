@@ -1,8 +1,4 @@
-import {
-  createForm,
-  required,
-  focus,
-} from "@modular-forms/solid";
+import { createForm, required, focus } from "@modular-forms/solid";
 import { useParams, useSearchParams } from "@solidjs/router";
 import {
   For,
@@ -160,6 +156,7 @@ function Tickets() {
                         platformId={commit.platform_id.toString()}
                         platformName={commit.platform_name}
                         message={commit.message}
+                        afterSubmit={() => refetch()}
                       />
                     )}
                   </For>
@@ -416,6 +413,7 @@ function AddCommit(props: { ticketId: number; afterCreate: () => void }) {
 
       <Match when={createCommitStatus() === "creating"}>
         <CommitForm
+          action="create"
           ticketId={props.ticketId}
           afterSubmit={() => {
             setCreateCommitStatus(() => "created");
@@ -430,12 +428,15 @@ function AddCommit(props: { ticketId: number; afterCreate: () => void }) {
   );
 }
 
+function prefixPadZero(value: string) {
+  return value.length === 1 ? `0${value}` : value;
+}
+
 function formatCommitedAt(commitedAt: string) {
   const dateObject = new Date(commitedAt);
   const year = dateObject.getFullYear();
   const month = dateObject.getMonth() + 1;
-  const formatMonth =
-    month.toString().length === 1 ? `0${month.toString()}` : month.toString();
+  const formatMonth = prefixPadZero(month.toString());
   const date = dateObject.getDate();
 
   const hours = dateObject.getHours();
@@ -451,6 +452,7 @@ function EditableCommit(props: {
   platformName: string;
   hashed: string;
   message?: string;
+  afterSubmit: () => void;
 }) {
   const [edit, setEdit] = createSignal(false);
 
@@ -495,23 +497,80 @@ function EditableCommit(props: {
         </button>
       }
     >
-      ok
+      <CommitForm
+        action="edit"
+        ticketId={props.ticketId}
+        fields={{
+          commitedAt: props.commitedAt,
+          platformId: props.platformId,
+          hashed: props.hashed,
+          message: props.message,
+        }}
+        afterSubmit={() => {
+          setEdit(false);
+          props.afterSubmit();
+        }}
+        cancelAction={() => {
+          setEdit(false);
+        }}
+      />
     </Show>
   );
 }
 
-function CommitForm(props: {
+function toDatetimeLocalValue(datetime: string) {
+  const dateObject = new Date(datetime);
+  const year = dateObject.getFullYear();
+  const month = dateObject.getMonth() + 1;
+  const formatMonth = prefixPadZero(month.toString());
+  const date = dateObject.getDate();
+  const formatDate = prefixPadZero(date.toString());
+
+  const hours = dateObject.getHours();
+  const minutes = dateObject.getMinutes();
+
+  //YYYY-MM-DDThh:mm
+  return `${year}-${formatMonth}-${formatDate}T${hours}:${minutes}`;
+}
+
+type CommitFormBaseProps = {
   ticketId: number;
   afterSubmit: (values: NewCommit) => void;
   cancelAction?: () => void;
-}) {
+};
+
+type CreateCommitForm = {
+  action: "create";
+} & CommitFormBaseProps;
+
+type EditCommitForm = {
+  action: "edit";
+  fields: {
+    commitedAt: string;
+    platformId: string;
+    hashed: string;
+    message?: string;
+  };
+} & CommitFormBaseProps;
+
+type CommitFormProps = CreateCommitForm | EditCommitForm;
+
+function CommitForm(props: CommitFormProps) {
   const [commitForm, { Form, Field }] = createForm<NewCommit>({
-    initialValues: {
-      commitedAt: "",
-      platformId: "",
-      hashed: "",
-      message: undefined,
-    },
+    initialValues:
+      props.action === "create"
+        ? {
+            commitedAt: "",
+            platformId: "",
+            hashed: "",
+            message: undefined,
+          }
+        : {
+            commitedAt: toDatetimeLocalValue(props.fields.commitedAt),
+            platformId: props.fields.platformId,
+            hashed: props.fields.hashed,
+            message: props.fields.message,
+          },
   });
 
   onMount(() => {
@@ -521,7 +580,9 @@ function CommitForm(props: {
   return (
     <Form
       onSubmit={async (values) => {
-        await createCommit(props.ticketId, values);
+        if (props.action === "create") {
+          await createCommit(props.ticketId, values);
+        }
         props.afterSubmit(values);
       }}
     >
