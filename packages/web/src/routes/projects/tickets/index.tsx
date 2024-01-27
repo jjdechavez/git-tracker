@@ -1,7 +1,5 @@
 import {
   createForm,
-  insert,
-  remove,
   required,
   focus,
 } from "@modular-forms/solid";
@@ -25,7 +23,7 @@ import {
   ModularTextInput,
 } from "~/components/form/modular/text-field";
 import { EmptyState, LoadingState } from "~/components/state";
-import { Bin, Check, ChevronDown, XMark } from "~/components/svg";
+import { Check, XMark } from "~/components/svg";
 import {
   NewTicket,
   createTicket,
@@ -197,6 +195,7 @@ function Tickets() {
                             project_id: 0,
                             name: result.values.name,
                             description: result.values.description,
+                            commits: [],
                           },
                         ];
                       });
