@@ -97,7 +97,6 @@ function Tickets(props: { searchTicket: string }) {
   );
   const [createTicketStatus, setCreateTicketStatus] =
     createSignal<CreateTicketStatus>("idle");
-  refetch({});
 
   return (
     <Card>
@@ -110,7 +109,13 @@ function Tickets(props: { searchTicket: string }) {
             />
           </Match>
 
-          <Match when={tickets.state === "ready" && tickets().length === 0}>
+          <Match
+            when={
+              tickets.state === "ready" &&
+              tickets().length === 0 &&
+              props.searchTicket.length === 0
+            }
+          >
             <EmptyState message="No tickets to show" class="md:p-7">
               <Button
                 type="button"
@@ -120,6 +125,19 @@ function Tickets(props: { searchTicket: string }) {
                 New ticket
               </Button>
             </EmptyState>
+          </Match>
+
+          <Match
+            when={
+              tickets.state === "ready" &&
+              tickets().length === 0 &&
+              props.searchTicket.length > 0
+            }
+          >
+            <EmptyState
+              message="No tickets to show that matched on search"
+              class="md:p-7"
+            ></EmptyState>
           </Match>
 
           <Match
