@@ -30,6 +30,8 @@ import { NewCommit, createCommit, updateCommit } from "~/data/commit";
 import { ModularSelect } from "~/components/form/modular/select";
 import { useProject } from "~/providers/project";
 import { listPlatforms } from "~/data/platform";
+import { Input } from "~/components/form/input";
+import { Label } from "~/components/form/label";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,17 +47,23 @@ export function ProjectTicketsRoute() {
         </hgroup>
       </div>
 
-      <Show when={searchParams.platform}>
-        <p>
-          Platform:{" "}
-          <OutlineBadge>
-            {searchParams.platform}
-            <CloseButtonBadge
-              onClick={() => setSearchParams({ platform: "" })}
-            />
-          </OutlineBadge>
-        </p>
-      </Show>
+      <div class="flex items-center justify-start gap-x-2">
+        <div class="flex gap-x-2 w-auto">
+          <Label for="search" class="mt-1">Search:</Label>
+          <Input type="text" name="search" />
+        </div>
+        <Show when={searchParams.platform}>
+          <p>
+            Platform:{" "}
+            <OutlineBadge>
+              {searchParams.platform}
+              <CloseButtonBadge
+                onClick={() => setSearchParams({ platform: "" })}
+              />
+            </OutlineBadge>
+          </p>
+        </Show>
+      </div>
 
       <div class="mt-8">
         <Tickets />
