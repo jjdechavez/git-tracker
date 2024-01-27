@@ -1,4 +1,4 @@
-import { useJsonBody } from "sst/node/api";
+import { useJsonBody, usePathParam } from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Commit } from "@git-tracker/core/commit";
 import {
@@ -52,5 +52,50 @@ export const create = withApiAuth(async () => {
   return {
     statusCode: 201,
     body: JSON.stringify(commit),
+  };
+});
+
+export const update = withApiAuth(async () => {
+  const session = useSession();
+
+  if (session.type !== "user") {
+    throw new UnauthorizedResponse();
+  }
+
+  const commitId = usePathParam("commitId");
+
+  if (!commitId) {
+    throw new BadRequestResponse("Missing commit ID");
+  }
+
+  const body = useJsonBody();
+
+  if (!body) {
+    throw new BadRequestResponse("Missing body");
+  }
+
+  const commit = await Commit.findById(commitId, {
+    creator_id: session.properties.userID,
+  });
+
+  if (!commit) {
+    throw new NotFoundResponse("Commit not found");
+  }
+
+  const validateSchema = Commit.updateSchema.safeParse({
+    platform_id: Number(body.platformId),
+    commited_at: new Date(body.commitedAt),
+    hashed: body.hashed,
+    message: body.message,
+  });
+
+  if (!validateSchema.success) {
+    throw new BadRequestResponse(validateSchema.error.message);
+  }
+
+  await Commit.update(commitId, validateSchema.data);
+
+  return {
+    statusCode: 204,
   };
 });

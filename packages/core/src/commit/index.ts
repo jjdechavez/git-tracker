@@ -3,6 +3,7 @@ export * as Commit from "./";
 import { z } from "zod";
 import { db } from "../kysely";
 import { CommitStatuses } from "./commit.sql";
+import { idSchema } from "../util/zod";
 
 export const Info = z.object({
   id: z.number(),
@@ -38,3 +39,44 @@ export const create = z
       .returning("commit.id")
       .executeTakeFirstOrThrow()
   );
+
+export const updateSchema = Info.pick({
+  platform_id: true,
+  commited_at: true,
+  hashed: true,
+  message: true,
+}).partial();
+
+export const update = z
+  .function()
+  .args(idSchema, updateSchema)
+  .implement(async (commitId, updateWith) => {
+    await db
+      .updateTable("commit")
+      .set({
+        ...updateWith,
+        commited_at: updateWith.commited_at?.toISOString(),
+      })
+      .where("id", "=", commitId)
+      .execute();
+  });
+
+export const findById = z
+  .function()
+  .args(idSchema, z.object({ creator_id: idSchema }))
+  .implement(async (commitId, criteria) => {
+    const commit = await db
+      .selectFrom("commit")
+      .select([
+        "commit.id",
+        "commit.platform_id",
+        "commit.hashed",
+        "commit.commited_at",
+        "commit.message",
+      ])
+      .where("commit.id", "=", commitId)
+      .where("commit.creator_id", "=", criteria.creator_id)
+      .executeTakeFirst();
+
+    return commit;
+  });

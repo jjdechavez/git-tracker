@@ -94,6 +94,12 @@ export function ApiStack({ stack }: StackContext) {
           description: "Create commit",
         },
       },
+      "PUT /commits/{commitId}": {
+        function: {
+          handler: "packages/functions/src/commit.update",
+          description: "Update commit by id",
+        },
+      },
     },
   });
 

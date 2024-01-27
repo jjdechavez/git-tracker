@@ -26,7 +26,7 @@ import {
   listTickets,
   updateTicket,
 } from "~/data/ticket";
-import { NewCommit, createCommit } from "~/data/commit";
+import { NewCommit, createCommit, updateCommit } from "~/data/commit";
 import { ModularSelect } from "~/components/form/modular/select";
 
 export function ProjectTicketsRoute() {
@@ -150,6 +150,7 @@ function Tickets() {
                   <For each={ticket.commits}>
                     {(commit) => (
                       <EditableCommit
+                        commitId={commit.id}
                         ticketId={ticket.id}
                         commitedAt={commit.commited_at}
                         hashed={commit.hashed}
@@ -453,6 +454,7 @@ function EditableCommit(props: {
   hashed: string;
   message?: string;
   afterSubmit: () => void;
+  commitId: number;
 }) {
   const [edit, setEdit] = createSignal(false);
 
@@ -499,6 +501,7 @@ function EditableCommit(props: {
     >
       <CommitForm
         action="edit"
+        commitId={props.commitId}
         ticketId={props.ticketId}
         fields={{
           commitedAt: props.commitedAt,
@@ -551,6 +554,7 @@ type EditCommitForm = {
     hashed: string;
     message?: string;
   };
+  commitId: number;
 } & CommitFormBaseProps;
 
 type CommitFormProps = CreateCommitForm | EditCommitForm;
@@ -582,6 +586,11 @@ function CommitForm(props: CommitFormProps) {
       onSubmit={async (values) => {
         if (props.action === "create") {
           await createCommit(props.ticketId, values);
+        } else if (props.action === "edit") {
+          await updateCommit(props.commitId, {
+            ...values,
+            ticketId: props.ticketId,
+          });
         }
         props.afterSubmit(values);
       }}

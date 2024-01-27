@@ -24,3 +24,12 @@ export const createCommit = async (ticketId: number, newCommit: NewCommit) => {
 
   return commit;
 };
+
+type UpdateCommit = NewCommit & { ticketId: number };
+
+export const updateCommit = async (
+  commitId: number,
+  updateWith: UpdateCommit
+) => {
+  await externalApi().url(`/commits/${commitId}`).put(updateWith).res();
+};
