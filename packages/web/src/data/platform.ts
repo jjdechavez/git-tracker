@@ -3,7 +3,6 @@ import { externalApi } from ".";
 
 export type NewPlatform = {
   name: string;
-  prefixTicket: string | null;
 };
 
 export const platformSchema = z.object({

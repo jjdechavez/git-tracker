@@ -28,6 +28,8 @@ import {
 } from "~/data/ticket";
 import { NewCommit, createCommit, updateCommit } from "~/data/commit";
 import { ModularSelect } from "~/components/form/modular/select";
+import { useProject } from "~/providers/project";
+import { listPlatforms } from "~/data/platform";
 
 export function ProjectTicketsRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -157,7 +159,9 @@ function Tickets() {
                         platformId={commit.platform_id.toString()}
                         platformName={commit.platform_name}
                         message={commit.message}
-                        afterSubmit={() => refetch()}
+                        afterSubmit={(_newCommit) => {
+                          refetch();
+                        }}
                       />
                     )}
                   </For>
@@ -453,7 +457,7 @@ function EditableCommit(props: {
   platformName: string;
   hashed: string;
   message?: string;
-  afterSubmit: () => void;
+  afterSubmit: (values: NewCommit) => void;
   commitId: number;
 }) {
   const [edit, setEdit] = createSignal(false);
@@ -509,9 +513,9 @@ function EditableCommit(props: {
           hashed: props.hashed,
           message: props.message,
         }}
-        afterSubmit={() => {
+        afterSubmit={(values) => {
           setEdit(false);
-          props.afterSubmit();
+          props.afterSubmit(values);
         }}
         cancelAction={() => {
           setEdit(false);
@@ -576,6 +580,12 @@ function CommitForm(props: CommitFormProps) {
             message: props.fields.message,
           },
   });
+  const project = useProject();
+
+  const [platforms] = createResource(
+    () => ({ project_id: project.id.toString() }),
+    listPlatforms
+  );
 
   onMount(() => {
     focus(commitForm, "commitedAt");
@@ -623,11 +633,10 @@ function CommitForm(props: CommitFormProps) {
                 {...fieldProps}
                 label="Platform"
                 placeholder="Select a platform"
-                options={[
-                  { label: "SFM", value: "1" },
-                  { label: "Shoretrade", value: "2" },
-                  { label: "White Prince", value: "3" },
-                ]}
+                options={(platforms() || []).map((platform) => ({
+                  label: platform.name,
+                  value: platform.id.toString(),
+                }))}
                 value={field.value}
                 error={field.error}
                 required

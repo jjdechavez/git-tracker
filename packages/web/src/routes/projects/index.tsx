@@ -52,14 +52,23 @@ function Overview() {
             </p>
           </hgroup>
 
-          <div>
+          <div class="flex gap-x-2">
             <Link
               href={ROUTES.CREATE_PLATFORM_ROUTE.set(params.projectSlug)}
               type="button"
               size="sm"
               class="inline-flex items-center gap-x-2"
+              variants="secondary"
             >
               New Platform
+            </Link>
+            <Link
+              href={ROUTES.TICKETS_ROUTE.set(params.projectSlug)}
+              type="button"
+              size="sm"
+              class="inline-flex items-center gap-x-2"
+            >
+              View tickets
             </Link>
           </div>
         </div>

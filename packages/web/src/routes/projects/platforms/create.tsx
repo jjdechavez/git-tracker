@@ -61,19 +61,6 @@ export function CreatePlatformRoute() {
                 </ModularControl>
               )}
             </Field>
-            <Field name="prefixTicket">
-              {(field, props) => (
-                <ModularControl fullWidth>
-                  <ModularTextInput
-                    {...props}
-                    type="text"
-                    value={field.value || ""}
-                    error={field.error}
-                    info="This would be use as ticket prefix."
-                  />
-                </ModularControl>
-              )}
-            </Field>
             <div class="p-2 w-full">
               <Button
                 type="submit"
