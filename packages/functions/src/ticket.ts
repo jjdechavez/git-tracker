@@ -1,4 +1,9 @@
-import { useJsonBody, usePathParam, useQueryParam } from "sst/node/api";
+import {
+  useJsonBody,
+  usePathParam,
+  useQueryParam,
+  useQueryParams,
+} from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Ticket } from "@git-tracker/core/ticket";
 import {
@@ -66,8 +71,11 @@ export const list = withApiAuth(async (_evt) => {
     throw new NotFoundResponse("Project not found by slug");
   }
 
+  const search = useQueryParam("s");
+
   const tickets = await Ticket.list(session.properties.userID, {
     projectId: project.id,
+    s: search,
   });
 
   return {

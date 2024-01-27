@@ -68,8 +68,8 @@ export const list = z
         const search = criteria.s as string;
 
         return eb.or([
-          eb("ticket.name", "like", search),
-          eb("ticket.description", "like", search),
+          eb("ticket.name", "like", `%${search}%`),
+          eb("ticket.description", "like", `%${search}%`),
         ]);
       });
     }
