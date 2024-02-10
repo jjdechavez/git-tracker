@@ -25,7 +25,7 @@ export function CreatePlatformRoute() {
       throw new FormError<NewPlatform>(result.error.message);
     }
 
-    navigate(ROUTES.HOME_ROUTE, { replace: true });
+    navigate(ROUTES.PROJECT_SLUG_ROUTE.set(params.projectSlug), { replace: true });
   };
 
   return (
