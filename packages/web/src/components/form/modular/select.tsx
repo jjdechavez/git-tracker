@@ -1,5 +1,6 @@
 import { splitProps, type JSX, For, Show } from "solid-js";
 import { Label } from "../label";
+import { Info } from "../info";
 
 type Option = {
   label: string;
@@ -35,9 +36,11 @@ export function ModularSelect(props: SelectProps) {
         {...selectProps}
         name={rootProps.name}
         class="py-3 px-4 pe-9 block w-full bg-gray-800 bg-opacity-40 text-sm text-gray-100 border rounded border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-900 disabled:opacity-50 disabled:pointer-events-none"
-        aria-errormessage={props.error}
+        required={rootProps.required}
+        aria-invalid={!!selectProps.error}
+        aria-errormessage={`${rootProps.name}-error`}
       >
-        <option>
+        <option value="" hidden selected disabled>
           <Show when={rootProps.placeholder} fallback="Select an option">
             {rootProps.placeholder}
           </Show>
@@ -53,6 +56,9 @@ export function ModularSelect(props: SelectProps) {
           )}
         </For>
       </select>
+      <Show when={props.error}>
+        <Info state="error">{props.error}</Info>
+      </Show>
     </>
   );
 }
