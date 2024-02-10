@@ -9,16 +9,17 @@ import {
 } from "@solidjs/router";
 import { Match, ParentProps, Switch, createResource } from "solid-js";
 import { useStorage } from "./providers/storage";
-import { findProjectBySlug, listProjects } from "./data/project";
+import { ProjectProvider } from "./providers/project";
+import { findProjectBySlug } from "./data/project";
 import { twMerge } from "tailwind-merge";
 import { buttonSizes, buttonVariants } from "./components/button";
+import { AvatarInitialsIcon } from "./components/avatar";
 
+import { HomeRoute } from "./routes/home";
 import { SigninRoute } from "./routes/signin";
 import { ProjectsRoute } from "./routes/projects";
 import { CreatePlatformRoute } from "./routes/projects/platforms/create";
 import { CreateProjectRoute } from "./routes/projects/create";
-import { AvatarInitialsIcon } from "./components/avatar";
-import { ProjectProvider } from "./providers/project";
 import { ProjectTicketsRoute } from "./routes/projects/tickets";
 
 export const ROUTES = {
@@ -88,47 +89,8 @@ function App() {
             );
           }}
         />
-        <Route path="" component={Layout}>
-          <Route
-            path={ROUTES.HOME_ROUTE}
-            component={() => {
-              const [result] = createResource(listProjects);
-
-              return (
-                <Switch>
-                  <Match when={result.loading}>
-                    <div>Loading...</div>
-                  </Match>
-                  <Match when={result.error}>
-                    <div>Error: {result.error}</div>
-                  </Match>
-                  <Match when={result()!.state === "failed_parse"}>
-                    <div>Failed Parse: {result()?.message}</div>
-                  </Match>
-                  <Match
-                    when={
-                      result()!.state === "ok" &&
-                      result()!.data!.data.length === 0
-                    }
-                  >
-                    <Navigate href={ROUTES.CREATE_PROJECT_ROUTE} />
-                  </Match>
-                  <Match
-                    when={
-                      result()!.state === "ok" &&
-                      result()!.data!.data.length > 0
-                    }
-                  >
-                    <Navigate
-                      href={ROUTES.PROJECT_SLUG_ROUTE.set(
-                        result()!.data!.data.find((d) => d)!.slug
-                      )}
-                    />
-                  </Match>
-                </Switch>
-              );
-            }}
-          />
+        <Route path="/" component={Layout}>
+          <Route path={ROUTES.HOME_ROUTE} component={HomeRoute} />
           <Route
             path={ROUTES.CREATE_PROJECT_ROUTE}
             component={CreateProjectRoute}

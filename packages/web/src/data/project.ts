@@ -32,19 +32,9 @@ export const listProjects = async () => {
   const projects = await externalApi()
     .url("/projects")
     .get()
-    .json(schema.safeParse);
+    .json(schema.parse);
 
-  if (!projects.success) {
-    return {
-      state: "failed_parse" as const,
-      message: projects.error.toString(),
-    };
-  }
-
-  return {
-    state: "ok" as const,
-    data: projects.data,
-  };
+  return projects.data;
 };
 
 export const findProjectBySlug = async (slug: string) => {
