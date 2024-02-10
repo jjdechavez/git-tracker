@@ -5,6 +5,7 @@ import {
   required,
 } from "@modular-forms/solid";
 import { useNavigate, useParams } from "@solidjs/router";
+import { Show } from "solid-js";
 import { ROUTES } from "~/App";
 import { Button } from "~/components/button";
 import {
@@ -25,7 +26,9 @@ export function CreatePlatformRoute() {
       throw new FormError<NewPlatform>(result.error.message);
     }
 
-    navigate(ROUTES.PROJECT_SLUG_ROUTE.set(params.projectSlug), { replace: true });
+    navigate(ROUTES.PROJECT_SLUG_ROUTE.set(params.projectSlug), {
+      replace: true,
+    });
   };
 
   return (
@@ -69,9 +72,12 @@ export function CreatePlatformRoute() {
                 class="w-full"
                 disabled={platformForm.submitting}
               >
-                {platformForm.submitting
-                  ? "Creating platform"
-                  : "Create platform"}
+                <Show
+                  when={platformForm.submitting}
+                  fallback={"Create platform"}
+                >
+                  Creating platform
+                </Show>
               </Button>
             </div>
           </Form>
