@@ -100,6 +100,24 @@ export function ApiStack({ stack }: StackContext) {
           description: "Update commit by id",
         },
       },
+      "POST /productions": {
+        function: {
+          handler: "packages/functions/src/production.create",
+          description: "Create production",
+        },
+      },
+      "GET /productions": {
+        function: {
+          handler: "packages/functions/src/production.list",
+          description: "List of productions",
+        },
+      },
+      "GET /productions/{productionId}": {
+        function: {
+          handler: "packages/functions/src/production.findById",
+          description: "Find production by id",
+        },
+      },
     },
   });
 

@@ -2,7 +2,6 @@ import {
   useJsonBody,
   usePathParam,
   useQueryParam,
-  useQueryParams,
 } from "sst/node/api";
 import { useSession } from "sst/node/auth";
 import { Ticket } from "@git-tracker/core/ticket";
