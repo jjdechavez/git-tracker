@@ -1,11 +1,4 @@
-import {
-  For,
-  Match,
-  Show,
-  Switch,
-  createResource,
-  createSignal,
-} from "solid-js";
+import { For, Match, Switch, createResource } from "solid-js";
 import { Navigate, useParams } from "@solidjs/router";
 import { useStorage } from "../../providers/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/card";
@@ -13,12 +6,12 @@ import { EmptyState, LoadingState } from "~/components/state";
 import {
   ListGroup,
   ListGroupAnchorItem,
-  ListGroupItem,
 } from "~/components/list-group";
 import { Link } from "~/components/link";
 import { ROUTES } from "~/App";
 import { listPlatforms } from "~/data/platform";
 import { useProject } from "~/providers/project";
+import { listProductions } from "~/data/production";
 
 export function ProjectsRoute() {
   const storage = useStorage();
@@ -37,7 +30,6 @@ export function ProjectsRoute() {
 
 function Overview() {
   const params = useParams();
-  const [test] = createSignal([]);
 
   return (
     <section>
@@ -53,6 +45,15 @@ function Overview() {
           </hgroup>
 
           <div class="flex gap-x-2">
+            <Link
+              href={ROUTES.CREATE_PRODUCTION_ROUTE.set(params.projectSlug)}
+              type="button"
+              size="sm"
+              class="inline-flex items-center gap-x-2"
+              variants="secondary"
+            >
+              New Production
+            </Link>
             <Link
               href={ROUTES.CREATE_PLATFORM_ROUTE.set(params.projectSlug)}
               type="button"
@@ -75,29 +76,7 @@ function Overview() {
 
         <div class="flex flex-col items-start gap-4 md:flex-row">
           <Platforms />
-
-          <Card class="flex-1 w-full">
-            <CardHeader>
-              <CardTitle>Production Pull Request</CardTitle>
-            </CardHeader>
-            <CardContent class="md:p-0">
-              <Show
-                when={test().length > 0}
-                fallback={
-                  <EmptyState
-                    message="No production pull request to show"
-                    class="md:p-7"
-                  />
-                }
-              >
-                <ListGroup>
-                  <For each={test()}>
-                    {(_) => <ListGroupItem>SFM</ListGroupItem>}
-                  </For>
-                </ListGroup>
-              </Show>
-            </CardContent>
-          </Card>
+          <Productions />
         </div>
       </div>
     </section>
@@ -170,6 +149,54 @@ function Platforms() {
                     class="justify-between"
                   >
                     <span>{platform.name}</span>
+                  </ListGroupAnchorItem>
+                )}
+              </For>
+            </ListGroup>
+          </Match>
+        </Switch>
+      </CardContent>
+    </Card>
+  );
+}
+
+function Productions() {
+  const project = useProject();
+
+  const [productions] = createResource(
+    () => ({ project_id: project.id.toString() }),
+    listProductions
+  );
+
+  return (
+    <Card class="flex-1 w-full">
+      <CardHeader>
+        <CardTitle>Production Pull Request</CardTitle>
+      </CardHeader>
+      <CardContent class="md:p-0">
+        <Switch>
+          <Match when={productions.state === "pending"}>
+            <LoadingState
+              message="Fetching platforms from the server"
+              class="md:p-7"
+            />
+          </Match>
+          <Match
+            when={productions.state === "ready" && productions().length === 0}
+          >
+            <EmptyState
+              message="No production pull request to show"
+              class="md:p-7"
+            />
+          </Match>
+          <Match
+            when={productions.state === "ready" && productions().length > 0}
+          >
+            <ListGroup>
+              <For each={productions()}>
+                {(production) => (
+                  <ListGroupAnchorItem href={"#"} class="justify-between">
+                    <span>{production.pushed_date}-{production.platform_slug}</span>
                   </ListGroupAnchorItem>
                 )}
               </For>

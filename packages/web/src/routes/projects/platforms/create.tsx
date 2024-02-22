@@ -43,7 +43,9 @@ export function CreatePlatformRoute() {
           </p>
         </div>
 
-        {platformForm.response.message}
+        <Show when={platformForm.response.message}>
+          {platformForm.response.message}
+        </Show>
 
         <div class="lg:w-1/2 md:w-2/3 mx-auto">
           <Form onSubmit={handleSubmit} class="grid gap-y-4">

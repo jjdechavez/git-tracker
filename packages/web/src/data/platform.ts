@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { externalApi } from ".";
+import { externalApi, getSearchParams } from ".";
 
 export type NewPlatform = {
   name: string;
@@ -49,14 +49,10 @@ export const listPlatforms = async (search: Partial<SearchPlatforms>) => {
     data: z.array(platformSchema),
   });
 
-  const searchParams = new URLSearchParams(search);
-  const params =
-    searchParams.toString().length === 0
-      ? searchParams.toString()
-      : `?${searchParams.toString()}`;
+  const searchParams = getSearchParams(search);
 
   const projects = await externalApi()
-    .url(`/platforms${params}`)
+    .url(`/platforms${searchParams}`)
     .get()
     .json(schema.parse);
 

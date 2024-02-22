@@ -5,3 +5,11 @@ export function externalApi() {
 
   return wretch(import.meta.env.VITE_APP_API_URL).auth(`Bearer ${token}`);
 }
+
+export function getSearchParams(params: Record<string, string>) {
+  const urlSearchParams = new URLSearchParams(params);
+
+  return urlSearchParams.toString().length === 0
+    ? urlSearchParams.toString()
+    : `?${urlSearchParams.toString()}`;
+}

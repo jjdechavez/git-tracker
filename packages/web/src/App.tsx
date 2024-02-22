@@ -21,6 +21,8 @@ import { ProjectsRoute } from "./routes/projects";
 import { CreatePlatformRoute } from "./routes/projects/platforms/create";
 import { CreateProjectRoute } from "./routes/projects/create";
 import { ProjectTicketsRoute } from "./routes/projects/tickets";
+import { CreateProductionRoute } from "./routes/projects/productions/create";
+import { ProductionDetailRoute } from "./routes/projects/productions/detail";
 
 export const ROUTES = {
   SIGNIN_ROUTE: "/signin",
@@ -45,6 +47,16 @@ export const ROUTES = {
     path: "/projects/:projectSlug/tickets",
     set: (projectSlug: string, platformSlug: string) =>
       `/projects/${projectSlug}/tickets?platform=${platformSlug}` as const,
+  },
+  CREATE_PRODUCTION_ROUTE: {
+    path: "/projects/:projectSlug/productions/create",
+    set: (projectSlug: string) =>
+      `/projects/${projectSlug}/productions/create` as const,
+  },
+  PRODUCTION_DETAIL_ROUTE: {
+    path: "/projects/:projectSlug/productions/:productionId",
+    set: (projectSlug: string, productionId: string) =>
+      `/projects/${projectSlug}/productions/${productionId}` as const,
   },
 } as const;
 
@@ -106,6 +118,14 @@ function App() {
           <Route
             path={ROUTES.TICKETS_ROUTE.path}
             component={ProjectTicketsRoute}
+          />
+          <Route
+            path={ROUTES.CREATE_PRODUCTION_ROUTE.path}
+            component={CreateProductionRoute}
+          />
+          <Route
+            path={ROUTES.PRODUCTION_DETAIL_ROUTE.path}
+            component={ProductionDetailRoute}
           />
           <Route path="*" component={() => <h1>Not found</h1>} />
         </Route>
