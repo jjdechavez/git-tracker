@@ -119,3 +119,27 @@ export const list = z
 
     return platforms;
   });
+
+export const findById = z
+  .function()
+  .args(idSchema, z.object({ creator_id: idSchema }).partial())
+  .implement(async (platformId, criteria) => {
+    let query = db
+      .selectFrom("platform")
+      .select([
+        "platform.id",
+        "platform.name",
+        "platform.slug",
+        "platform.status",
+      ]);
+
+    if (criteria.creator_id) {
+      query = query.where("creator_id", "=", criteria.creator_id);
+    }
+
+    const platform = await query
+      .where("id", "=", platformId)
+      .executeTakeFirst();
+
+    return platform;
+  });

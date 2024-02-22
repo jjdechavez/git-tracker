@@ -89,3 +89,20 @@ export const list = z
 
     return projects;
   });
+
+export const findById = z
+  .function()
+  .args(idSchema, z.object({ creator_id: idSchema }).partial())
+  .implement(async (projectId, criteria) => {
+    let query = db
+      .selectFrom("project")
+      .select(["project.id", "project.name", "project.slug", "project.status"]);
+
+    if (criteria.creator_id) {
+      query = query.where("creator_id", "=", criteria.creator_id);
+    }
+
+    const project = await query.where("id", "=", projectId).executeTakeFirst();
+
+    return project;
+  });

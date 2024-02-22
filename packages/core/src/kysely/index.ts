@@ -8,6 +8,7 @@ import { ProjectTable } from "../project/project.sql";
 import { PlatformTable } from "../platform/platform.sql";
 import { TicketTable } from "../ticket/ticket.sql";
 import { CommitTable } from "../commit/commit.sql";
+import { ProductionTable } from "../production/production.sql";
 
 interface Database {
   user: UserTable;
@@ -15,6 +16,7 @@ interface Database {
   platform: PlatformTable;
   ticket: TicketTable;
   commit: CommitTable;
+  production: ProductionTable;
 }
 
 const dialect = server.devMode
