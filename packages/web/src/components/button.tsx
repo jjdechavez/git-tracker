@@ -11,7 +11,7 @@ export const buttonVariants = {
     "text-white border-0 bg-indigo-600 hover:bg-indigo-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
   secondary:
     "text-base bg-gray-800 border-0 focus:outline-none hover:bg-gray-700",
-  link: "",
+  link: "text-indigo-400 decoration-2 hover:underline",
 } as const;
 
 export const buttonSizes = {
