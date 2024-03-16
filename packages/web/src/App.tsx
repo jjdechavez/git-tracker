@@ -158,7 +158,7 @@ function Layout(props: ParentProps) {
   }
 
   const params = useParams();
-  const [data] = createResource(params.projectSlug, findProjectBySlug);
+  const [data] = createResource(() => params.projectSlug, findProjectBySlug);
 
   return (
     <div class="container mx-auto max-w-5xl px-6">
